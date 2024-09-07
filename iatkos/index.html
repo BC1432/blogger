@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blog Post Manager</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://apis.google.com/js/api.js"></script>
 </head>
 <body>
     <div class="container mt-5">
@@ -37,7 +38,116 @@
         <div id="result" class="mt-4"></div>
     </div>
 
-    <script src="./js/script.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const BLOG_ID = '2499792346422287330'; // Replace with your actual Blog ID
+        const BASE_URL = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts`;
+
+        // Inicializa la autenticación OAuth 2.0
+        function authenticate() {
+            return gapi.auth2.getAuthInstance()
+                .signIn({scope: "https://www.googleapis.com/auth/blogger"})
+                .then(() => { console.log("Authenticated successfully!"); },
+                      (err) => { console.error("Error during authentication", err); });
+        }
+        
+        // Carga la API del cliente de Google
+        function loadClient() {
+            return gapi.client.load("https://content.googleapis.com/discovery/v1/apis/blogger/v3/rest")
+                .then(() => { console.log("API client loaded successfully"); },
+                      (err) => { console.error("Error loading API client", err); });
+        }
+
+        // Autentica y carga la API al iniciar la página
+        function initClient() {
+            gapi.load("client:auth2", () => {
+                gapi.auth2.init({client_id: 'YOUR_OAUTH_CLIENT_ID'});  // Coloca aquí tu client_id de OAuth
+                authenticate().then(loadClient);
+            });
+        }
+
+        // Crear un nuevo post
+        function createPost(title, content, labels) {
+            gapi.client.blogger.posts.insert({
+                blogId: BLOG_ID,
+                title: title,
+                content: content,
+                labels: labels
+            }).then(response => {
+                document.getElementById('result').textContent = `Post created successfully! ID: ${response.result.id}`;
+            }, error => {
+                document.getElementById('result').textContent = `Error creating post: ${error.message}`;
+            });
+        }
+
+        // Editar un post existente
+        function editPost(postId, title, content, labels) {
+            gapi.client.blogger.posts.update({
+                blogId: BLOG_ID,
+                postId: postId,
+                title: title,
+                content: content,
+                labels: labels
+            }).then(response => {
+                document.getElementById('result').textContent = `Post edited successfully! ID: ${response.result.id}`;
+            }, error => {
+                document.getElementById('result').textContent = `Error editing post: ${error.message}`;
+            });
+        }
+
+        // Borrar un post
+        function deletePost(postId) {
+            gapi.client.blogger.posts.delete({
+                blogId: BLOG_ID,
+                postId: postId
+            }).then(() => {
+                document.getElementById('result').textContent = `Post deleted successfully!`;
+            }, error => {
+                document.getElementById('result').textContent = `Error deleting post: ${error.message}`;
+            });
+        }
+
+        // Event listener para crear post
+        document.getElementById('postForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const postId = document.getElementById('postId').value;
+            const title = document.getElementById('postTitle').value;
+            const content = document.getElementById('postContent').value;
+            const labels = document.getElementById('postLabels').value.split(',');
+
+            if (!postId) {
+                createPost(title, content, labels);
+            }
+        });
+
+        // Event listener para editar post
+        document.getElementById('editBtn').addEventListener('click', function () {
+            const postId = document.getElementById('postId').value;
+            const title = document.getElementById('postTitle').value;
+            const content = document.getElementById('postContent').value;
+            const labels = document.getElementById('postLabels').value.split(',');
+
+            if (postId) {
+                editPost(postId, title, content, labels);
+            } else {
+                alert('Please enter a Post ID to edit.');
+            }
+        });
+
+        // Event listener para borrar post
+        document.getElementById('deleteBtn').addEventListener('click', function () {
+            const postId = document.getElementById('postId').value;
+
+            if (postId) {
+                deletePost(postId);
+            } else {
+                alert('Please enter a Post ID to delete.');
+            }
+        });
+
+        // Cargar la API y autenticar al cargar la página
+        window.onload = function() {
+            initClient();
+        }
+    </script>
 </body>
 </html>

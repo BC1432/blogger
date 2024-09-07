@@ -2,6 +2,46 @@ const API_KEY = 'AIzaSyAxnLLHBgT8l4Y60Kov6M_C9mYvoIV06II';
 const BLOG_ID = '2499792346422287330'; // Replace with your actual Blog ID
 const BASE_URL = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts`;
 
+
+function authenticate() {
+    return gapi.auth2.getAuthInstance()
+        .signIn({scope: "https://www.googleapis.com/auth/blogger"})
+        .then(() => { console.log("Authenticated successfully!"); },
+              (err) => { console.error("Error during authentication", err); });
+  }
+  
+  function loadClient() {
+    gapi.client.setApiKey(${API_KEY});  // Puedes añadir la clave de API aquí
+    return gapi.client.load("https://content.googleapis.com/discovery/v1/apis/blogger/v3/rest")
+        .then(() => { console.log("API client loaded successfully"); },
+              (err) => { console.error("Error loading API client", err); });
+  }
+  
+  // Llama a authenticate() primero, luego loadClient()
+  authenticate().then(loadClient);
+
+
+  function createPost(token, title, content, labels) {
+    fetch(`https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts`, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            title: title,
+            content: content,
+            labels: labels
+        })
+    })
+    .then(response => response.json())
+    .then(data => console.log(data))
+    .catch(error => console.error('Error:', error));
+  }
+
+
+
+
 document.getElementById('postForm').addEventListener('submit', function (e) {
     e.preventDefault();
     const postId = document.getElementById('postId').value;
