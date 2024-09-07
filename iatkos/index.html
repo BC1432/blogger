@@ -41,6 +41,7 @@
     <script>
         const BLOG_ID = '2499792346422287330'; // Replace with your actual Blog ID
         const BASE_URL = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts`;
+        const OAUTH_CLIENT_ID = '117738437504-k35v9mamlssq1t8062cs4dqn9nlnldc1.apps.googleusercontent.com';
 
         // Inicializa la autenticación OAuth 2.0
         function authenticate() {
@@ -60,7 +61,7 @@
         // Autentica y carga la API al iniciar la página
         function initClient() {
             gapi.load("client:auth2", () => {
-                gapi.auth2.init({client_id: 'YOUR_OAUTH_CLIENT_ID'});  // Coloca aquí tu client_id de OAuth
+                gapi.auth2.init({client_id: `${OAUTH_CLIENT_ID}`});  // Coloca aquí tu client_id de OAuth
                 authenticate().then(loadClient);
             });
         }
