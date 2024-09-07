@@ -8,7 +8,42 @@
     <script src="https://apis.google.com/js/api.js"></script>
 </head>
 <body>
-    <div class="container mt-5">
+    <div class="container my-3">
+        <button id="loginBtn" class="btn btn-primary">Log in with Google</button>
+
+        <script>
+            const BLOG_ID = '2499792346422287330'; 
+            const OAUTH_CLIENT_ID = '117738437504-k35v9mamlssq1t8062cs4dqn9nlnldc1.apps.googleusercontent.com';
+        
+            function authenticate() {
+                return gapi.auth2.getAuthInstance()
+                    .signIn({scope: "https://www.googleapis.com/auth/blogger"})
+                    .then(() => { console.log("Authenticated successfully!"); },
+                          (err) => { console.error("Error during authentication", err); });
+            }
+        
+            function loadClient() {
+                return gapi.client.load("https://content.googleapis.com/discovery/v1/apis/blogger/v3/rest")
+                    .then(() => { console.log("API client loaded successfully"); },
+                          (err) => { console.error("Error loading API client", err); });
+            }
+        
+            function initClient() {
+                gapi.load("client:auth2", () => {
+                    gapi.auth2.init({client_id: OAUTH_CLIENT_ID}); 
+                });
+            }
+        
+            document.getElementById('loginBtn').addEventListener('click', function () {
+                authenticate().then(loadClient);
+            });
+        
+            window.onload = function() {
+                initClient();
+            };
+        </script>
+    </div>
+    <div class="container my-3">
         <h1 class="text-center">Manage Blog Posts</h1>
 
         <!-- Formulario para crear/editar un post -->
