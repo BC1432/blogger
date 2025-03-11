@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editor INSEGURO de Posts para Blogger (EDUCATIVO)</title>
+    <title>Editor INSEGURO de Posts para Blogger (EDUCATIVO v2)</title>
     <script src="https://cdn.tailwindcss.com/3.0.0"></script>
     <script src="https://apis.google.com/js/api.js"></script>
 </head>
 <body class="bg-gray-100 p-4 font-sans">
     <div class="max-w-xl mx-auto bg-white p-8 rounded shadow-md">
-        <h1 class="text-2xl font-bold mb-6 text-gray-800">Editor INSEGURO de Posts de Blogger (EDUCATIVO v1)</h1>
+        <h1 class="text-2xl font-bold mb-6 text-gray-800">Editor INSEGURO de Posts de Blogger (EDUCATIVO)</h1>
         <p class="text-red-500 mb-4"><strong>¡ADVERTENCIA DE SEGURIDAD! ESTO ES SOLO PARA FINES EDUCATIVOS. NO USAR EN PRODUCCIÓN.</strong></p>
 
         <div id="auth-section" class="mb-6">
@@ -43,29 +43,41 @@
 
         function initClient() {
             gapi.load('client:auth2', () => {
-                gapi.client.init({
-                    clientId: CLIENT_ID,
+                gapi.auth2.init({
+                    client_id: CLIENT_ID,
                     scope: 'https://www.googleapis.com/auth/blogger',
                 }).then(() => {
                     console.log('API inicializada correctamente');
                     updateAuthStatus();
                 }).catch(error => {
                     console.error('Error al inicializar la API:', error);
+                    document.getElementById('authStatus').innerText = 'Error al inicializar la API: ' + error.details;
                 });
             });
         }
 
         function authenticate() {
             const authInstance = gapi.auth2.getAuthInstance();
+            if (!authInstance) {
+                document.getElementById('authStatus').innerText = 'Error: Auth2 no inicializado.';
+                return;
+            }
+
             authInstance.signIn().then(() => {
                 updateAuthStatus();
             }).catch(error => {
-                document.getElementById('authStatus').innerText = 'Error de Autenticación: ' + error.message;
+                console.error('Error de autenticación:', error);
+                document.getElementById('authStatus').innerText = 'Error de Autenticación: ' + (error.error || error.message || 'Desconocido');
             });
         }
 
         function updateAuthStatus() {
             const authInstance = gapi.auth2.getAuthInstance();
+            if (!authInstance) {
+                document.getElementById('authStatus').innerText = 'Error: Auth2 no inicializado.';
+                return;
+            }
+
             const user = authInstance.currentUser.get();
             const isAuthorized = user.hasGrantedScopes('https://www.googleapis.com/auth/blogger');
             if (isAuthorized) {
