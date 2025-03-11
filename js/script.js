@@ -1,23 +1,25 @@
 /*******************************************
- * Ajustado para el nuevo HTML con:
- * - Campo de ID del post (postId)
- * - Campo de Título (postTitle)
- * - Campo de Contenido (postContent)
- * - Botones Crear / Editar / Borrar Post
+ * script.js
+ * Ajustado para:
+ * - Autenticación con Google (gapi)
+ * - Crear / Editar / Borrar Posts en Blogger
+ * - Uso de una política CSP que permite scripts de Google
  *******************************************/
 
-// Reemplaza con tus propios datos si fuera necesario
-const CLIENT_ID = '453533828701-l7rm9i7ved0mg7kvfu0oksq4t9smbakb.apps.googleusercontent.com';
-const BLOG_ID   = '3894102744035730320';
+// Reemplaza con tus datos
+const CLIENT_ID = 'TU_CLIENT_ID.apps.googleusercontent.com'; 
+const BLOG_ID   = 'TU_BLOG_ID';
 
-// Variable global para almacenar el token de acceso
+// Token de acceso global
 let accessToken = null;
 
-// Inicializa el cliente de Google API al cargar la página
+/**
+ * Se llama al cargar la ventana. Inicializa la API gapi.
+ */
 window.onload = initClient;
 
 /**
- * Carga las librerías de Google y prepara la autenticación.
+ * Inicializa la librería gapi, configurando Auth2.
  */
 function initClient() {
   gapi.load('client:auth2', () => {
@@ -26,8 +28,8 @@ function initClient() {
       scope: 'https://www.googleapis.com/auth/blogger'
     })
     .then(() => {
-      console.log('API de Google inicializada correctamente');
-      updateAuthStatus();
+      console.log('API de Google inicializada');
+      updateAuthStatus(); // Verifica si ya estamos autenticados
     })
     .catch(error => {
       console.error('Error al inicializar la API:', error);
@@ -38,20 +40,23 @@ function initClient() {
 }
 
 /**
- * Inicia la autenticación con Google.
+ * Inicia el proceso de autenticación con Google.
  */
 function authenticate() {
   const authInstance = gapi.auth2.getAuthInstance();
   if (!authInstance) {
-    document.getElementById('authStatus').innerText = 'Error: Auth2 no inicializado.';
+    document.getElementById('authStatus').innerText =
+      'Error: Auth2 no inicializado.';
     return;
   }
 
+  // Llamamos a signIn() en respuesta a un clic del usuario
   authInstance.signIn()
     .then(() => {
       updateAuthStatus();
     })
     .catch(error => {
+      // Este catch se activa, por ejemplo, si el usuario cierra el popup
       console.error('Error de autenticación:', error);
       document.getElementById('authStatus').innerText =
         'Error de Autenticación: ' + (error.error || error.message || 'Desconocido');
@@ -59,43 +64,40 @@ function authenticate() {
 }
 
 /**
- * Verifica si el usuario está autenticado y actualiza la interfaz.
+ * Actualiza la interfaz según el estado de autenticación.
  */
 function updateAuthStatus() {
   const authInstance = gapi.auth2.getAuthInstance();
   if (!authInstance) {
-    document.getElementById('authStatus').innerText = 'Error: Auth2 no inicializado.';
+    document.getElementById('authStatus').innerText =
+      'Error: Auth2 no inicializado.';
     return;
   }
 
   const user = authInstance.currentUser.get();
   const isAuthorized = user.hasGrantedScopes('https://www.googleapis.com/auth/blogger');
-  
+
   if (isAuthorized) {
-    // Obtenemos el token de acceso
+    // Almacena el token
     accessToken = user.getAuthResponse().access_token;
 
-    // Mensaje de éxito y ajustes en la interfaz
-    document.getElementById('authStatus').innerText = 'Autenticado Correctamente.';
+    document.getElementById('authStatus').innerText =
+      'Autenticado correctamente.';
     document.getElementById('editor-section').classList.remove('hidden');
     document.getElementById('auth-section').classList.add('hidden');
 
-    // Habilitar botones de edición
+    // Habilita los botones de CRUD
     document.getElementById('createButton').disabled = false;
     document.getElementById('editButton').disabled   = false;
     document.getElementById('deleteButton').disabled = false;
-
   } else {
-    // Usuario NO autenticado
     accessToken = null;
     document.getElementById('authStatus').innerText =
       'No Autenticado. Haz clic en "Iniciar Sesión con Google".';
-    
-    // Ocultar sección del editor y mostrar login
     document.getElementById('editor-section').classList.add('hidden');
     document.getElementById('auth-section').classList.remove('hidden');
 
-    // Deshabilitar botones
+    // Deshabilita los botones
     document.getElementById('createButton').disabled = true;
     document.getElementById('editButton').disabled   = true;
     document.getElementById('deleteButton').disabled = true;
@@ -103,7 +105,7 @@ function updateAuthStatus() {
 }
 
 /**
- * Crea un nuevo Post en Blogger.
+ * Crear un nuevo Post en Blogger.
  */
 async function createPost() {
   if (!accessToken) {
@@ -117,7 +119,7 @@ async function createPost() {
 
   if (!title || !content) {
     document.getElementById('editorStatus').innerText =
-      'Error: Debes ingresar Título y Contenido para crear un post.';
+      'Error: Debes ingresar Título y Contenido para crear un Post.';
     return;
   }
 
@@ -128,7 +130,9 @@ async function createPost() {
       path: `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts`,
       method: 'POST',
       body: { title, content },
-      headers: { Authorization: `Bearer ${accessToken}` }
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      }
     });
 
     if (response.status === 200) {
@@ -137,8 +141,9 @@ async function createPost() {
     } else {
       document.getElementById('editorStatus').innerText =
         'Error al Crear Post: ' + response.status + ' ' + response.statusText;
-      console.error('Error al crear post:', response);
+      console.error('Error al crear Post:', response);
     }
+
   } catch (error) {
     document.getElementById('editorStatus').innerText =
       'Error al Crear Post: ' + error.message;
@@ -147,7 +152,7 @@ async function createPost() {
 }
 
 /**
- * Edita un Post existente en Blogger.
+ * Editar un Post existente.
  */
 async function editPost() {
   if (!accessToken) {
@@ -162,24 +167,26 @@ async function editPost() {
 
   if (!postId) {
     document.getElementById('editorStatus').innerText =
-      'Error: Debes ingresar el ID del Post que deseas editar.';
+      'Error: Necesitas el ID del Post para poder editarlo.';
     return;
   }
 
   if (!title && !content) {
     document.getElementById('editorStatus').innerText =
-      'Error: Debes ingresar al menos Título o Contenido para editar el Post.';
+      'Error: Debes ingresar Título y/o Contenido para editar el Post.';
     return;
   }
 
-  document.getElementById('editorStatus').innerText = 'Editando post...';
+  document.getElementById('editorStatus').innerText = 'Editando Post...';
 
   try {
     const response = await gapi.client.request({
       path: `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts/${postId}`,
       method: 'PUT',
       body: { title, content },
-      headers: { Authorization: `Bearer ${accessToken}` }
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      }
     });
 
     if (response.status === 200) {
@@ -188,8 +195,9 @@ async function editPost() {
     } else {
       document.getElementById('editorStatus').innerText =
         'Error al Editar Post: ' + response.status + ' ' + response.statusText;
-      console.error('Error al editar post:', response);
+      console.error('Error al editar Post:', response);
     }
+
   } catch (error) {
     document.getElementById('editorStatus').innerText =
       'Error al Editar Post: ' + error.message;
@@ -198,7 +206,7 @@ async function editPost() {
 }
 
 /**
- * Elimina un Post existente en Blogger.
+ * Borrar un Post existente.
  */
 async function deletePost() {
   if (!accessToken) {
@@ -210,20 +218,22 @@ async function deletePost() {
   const postId = document.getElementById('postId').value.trim();
   if (!postId) {
     document.getElementById('editorStatus').innerText =
-      'Error: Debes ingresar el ID del Post que deseas borrar.';
+      'Error: Debes ingresar el ID del Post para borrarlo.';
     return;
   }
 
-  document.getElementById('editorStatus').innerText = 'Borrando post...';
+  document.getElementById('editorStatus').innerText = 'Borrando Post...';
 
   try {
     const response = await gapi.client.request({
       path: `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts/${postId}`,
       method: 'DELETE',
-      headers: { Authorization: `Bearer ${accessToken}` }
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      }
     });
 
-    // DELETE suele devolver un objeto vacío con status 204 en caso de éxito
+    // DELETE puede devolver status 200 o 204 en caso de éxito
     if (response.status === 200 || response.status === 204) {
       document.getElementById('editorStatus').innerText =
         'Post Borrado Exitosamente.';
@@ -232,6 +242,7 @@ async function deletePost() {
         'Error al Borrar Post: ' + response.status + ' ' + response.statusText;
       console.error('Error al borrar post:', response);
     }
+
   } catch (error) {
     document.getElementById('editorStatus').innerText =
       'Error al Borrar Post: ' + error.message;
