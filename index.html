@@ -1,169 +1,129 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blog Post Manager</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Editor INSEGURO de Posts para Blogger (EDUCATIVO)</title>
+    <script src="https://cdn.tailwindcss.com/3.0.0"></script>
     <script src="https://apis.google.com/js/api.js"></script>
 </head>
-<body>
-    <div class="container my-3">
-        <button id="loginBtn" class="btn btn-outline-dark">Log in with Google</button>
-        <script>
-            const BLOG_ID = '3894102744035730320'; 
-            const OAUTH_CLIENT_ID = '453533828701-l7rm9i7ved0mg7kvfu0oksq4t9smbakb.apps.googleusercontent.com';
+<body class="bg-gray-100 p-4 font-sans">
+    <div class="max-w-xl mx-auto bg-white p-8 rounded shadow-md">
+        <h1 class="text-2xl font-bold mb-6 text-gray-800">Editor INSEGURO de Posts de Blogger (EDUCATIVO)</h1>
+        <p class="text-red-500 mb-4"><strong>¡ADVERTENCIA DE SEGURIDAD! ESTO ES SOLO PARA FINES EDUCATIVOS. NO USAR EN PRODUCCIÓN.</strong></p>
 
-            function authenticate() {
-                return gapi.auth2.getAuthInstance()
-                    .signIn({scope: "https://www.googleapis.com/auth/blogger"})
-                    .then(() => { 
-                        console.log("Authenticated successfully!");
-                        document.getElementById('postForm').style.display = 'block';
-                    },
-                    (err) => { 
-                        console.error("Error during authentication", err);
-                        alert("Authentication failed. Please try again and ensure popups are allowed.");
-                    });
-            }
+        <div id="auth-section" class="mb-6">
+            <button onclick="authenticate()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                1. Iniciar Sesión con Google
+            </button>
+            <div id="authStatus" class="mt-2 text-sm text-gray-700 italic"></div>
+        </div>
 
-            function loadClient() {
-                return gapi.client.load("https://content.googleapis.com/discovery/v1/apis/blogger/v3/rest")
-                    .then(() => { console.log("API client loaded successfully"); },
-                          (err) => { console.error("Error loading API client", err); });
-            }
-
-            function initClient() {
-                gapi.load("client:auth2", () => {
-                    gapi.auth2.init({client_id: OAUTH_CLIENT_ID})
-                    .then(() => {
-                        console.log("Auth client initialized");
-                    }, (err) => {
-                        console.error("Error initializing client", err);
-                        alert("Error initializing Google OAuth. Please check your OAuth configuration.");
-                    });
-                });
-            }
-
-            document.getElementById('loginBtn').addEventListener('click', function () {
-                authenticate().then(loadClient);
-            });
-
-            window.onload = function() {
-                initClient();
-            };
-        </script>
-    </div>
-
-    <div class="container my-3">
-        <h1 class="text-center">Manage Blog Posts</h1>
-
-        <!-- Formulario para crear/editar un post -->
-        <form id="postForm" class="mt-4" style="display: none;">
-            <div class="mb-3">
-                <label for="postId" class="form-label">Post ID (only for edit/delete)</label>
-                <input type="text" class="form-control" id="postId" placeholder="Leave empty for new post">
+        <div id="editor-section" class="hidden">
+            <h2 class="text-xl font-semibold mb-4 text-gray-800">Editor de Posts</h2>
+            <div class="mb-4">
+                <label for="postId" class="block text-gray-700 text-sm font-bold mb-2">ID del Post a Editar:</label>
+                <input type="text" id="postId" placeholder="ID del Post" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
             </div>
-            <div class="mb-3">
-                <label for="postTitle" class="form-label">Title</label>
-                <input type="text" class="form-control" id="postTitle" placeholder="Enter post title" required>
+            <div class="mb-6">
+                <label for="content" class="block text-gray-700 text-sm font-bold mb-2">Nuevo Contenido del Post:</label>
+                <textarea id="content" placeholder="Nuevo Contenido" rows="8" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"></textarea>
             </div>
-            <div class="mb-3">
-                <label for="postContent" class="form-label">Content</label>
-                <textarea class="form-control" id="postContent" rows="5" placeholder="Enter post content" required></textarea>
-            </div>
-            <div class="mb-3">
-                <label for="postLabels" class="form-label">Labels (comma-separated)</label>
-                <input type="text" class="form-control" id="postLabels" placeholder="Enter post labels">
-            </div>
-            <button type="submit" class="btn btn-primary" id="createBtn">Create Post</button>
-            <button type="button" class="btn btn-success" id="editBtn">Edit Post</button>
-            <button type="button" class="btn btn-danger" id="deleteBtn">Delete Post</button>
-        </form>
-
-        <!-- Resultado de la operación -->
-        <div id="result" class="mt-4"></div>
+            <button onclick="editPost()" id="editButton" disabled class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50">
+                2. Editar Post (Desactivado hasta autenticar)
+            </button>
+            <div id="editStatus" class="mt-2 text-sm text-gray-700 italic"></div>
+        </div>
     </div>
 
     <script>
-        // Crear un nuevo post
-        function createPost(title, content, labels) {
-            gapi.client.blogger.posts.insert({
-                blogId: BLOG_ID,
-                title: title,
-                content: content,
-                labels: labels
-            }).then(response => {
-                document.getElementById('result').textContent = `Post created successfully! ID: ${response.result.id}`;
-            }, error => {
-                document.getElementById('result').textContent = `Error creating post: ${error.message}`;
+        let accessToken = null;
+        const CLIENT_ID = '453533828701-l7rm9i7ved0mg7kvfu0oksq4t9smbakb.apps.googleusercontent.com'; // ¡REEMPLAZA con tu ID de cliente de Google Cloud!
+        const BLOG_ID = '3894102744035730320'; // ¡REEMPLAZA con el ID de tu blog de Blogger!
+
+        function initClient() {
+            gapi.load('client:auth2', () => {
+                gapi.client.init({
+                    clientId: CLIENT_ID,
+                    scope: 'https://www.googleapis.com/auth/blogger',
+                }).then(() => {
+                    console.log('API inicializada correctamente');
+                    updateAuthStatus();
+                }).catch(error => {
+                    console.error('Error al inicializar la API:', error);
+                });
             });
         }
 
-        // Editar un post existente
-        function editPost(postId, title, content, labels) {
-            gapi.client.blogger.posts.update({
-                blogId: BLOG_ID,
-                postId: postId,
-                title: title,
-                content: content,
-                labels: labels
-            }).then(response => {
-                document.getElementById('result').textContent = `Post edited successfully! ID: ${response.result.id}`;
-            }, error => {
-                document.getElementById('result').textContent = `Error editing post: ${error.message}`;
+        function authenticate() {
+            const authInstance = gapi.auth2.getAuthInstance();
+            authInstance.signIn().then(() => {
+                updateAuthStatus();
+            }).catch(error => {
+                document.getElementById('authStatus').innerText = 'Error de Autenticación: ' + error.message;
             });
         }
 
-        // Borrar un post
-        function deletePost(postId) {
-            gapi.client.blogger.posts.delete({
-                blogId: BLOG_ID,
-                postId: postId
-            }).then(() => {
-                document.getElementById('result').textContent = `Post deleted successfully!`;
-            }, error => {
-                document.getElementById('result').textContent = `Error deleting post: ${error.message}`;
-            });
-        }
-
-        // Event listener para crear post
-        document.getElementById('postForm').addEventListener('submit', function (e) {
-            e.preventDefault();
-            const postId = document.getElementById('postId').value;
-            const title = document.getElementById('postTitle').value;
-            const content = document.getElementById('postContent').value;
-            const labels = document.getElementById('postLabels').value.split(',');
-
-            if (!postId) {
-                createPost(title, content, labels);
-            }
-        });
-
-        // Event listener para editar post
-        document.getElementById('editBtn').addEventListener('click', function () {
-            const postId = document.getElementById('postId').value;
-            const title = document.getElementById('postTitle').value;
-            const content = document.getElementById('postContent').value;
-            const labels = document.getElementById('postLabels').value.split(',');
-
-            if (postId) {
-                editPost(postId, title, content, labels);
+        function updateAuthStatus() {
+            const authInstance = gapi.auth2.getAuthInstance();
+            const user = authInstance.currentUser.get();
+            const isAuthorized = user.hasGrantedScopes('https://www.googleapis.com/auth/blogger');
+            if (isAuthorized) {
+                accessToken = user.getAuthResponse().access_token;
+                document.getElementById('authStatus').innerText = 'Autenticado Correctamente.';
+                document.getElementById('editButton').disabled = false; // Habilitar el botón de edición
+                document.getElementById('editor-section').classList.remove('hidden'); // Mostrar la sección del editor
+                document.getElementById('auth-section').classList.add('hidden'); // Ocultar el botón de autenticación
             } else {
-                alert('Please enter a Post ID to edit.');
+                document.getElementById('authStatus').innerText = 'No Autenticado. Haz clic en "Iniciar Sesión con Google".';
+                document.getElementById('editButton').disabled = true; // Deshabilitar el botón de edición
+                document.getElementById('editor-section').classList.add('hidden'); // Ocultar la sección del editor
+                document.getElementById('auth-section').classList.remove('hidden'); // Mostrar el botón de autenticación
             }
-        });
+        }
 
-        // Event listener para borrar post
-        document.getElementById('deleteBtn').addEventListener('click', function () {
+        async function editPost() {
+            if (!accessToken) {
+                document.getElementById('editStatus').innerText = 'Error: No estás autenticado. Inicia sesión primero.';
+                return;
+            }
+
             const postId = document.getElementById('postId').value;
+            const content = document.getElementById('content').value;
 
-            if (postId) {
-                deletePost(postId);
-            } else {
-                alert('Please enter a Post ID to delete.');
+            if (!postId || !content) {
+                document.getElementById('editStatus').innerText = 'Error: Por favor, ingresa el ID del Post y el Nuevo Contenido.';
+                return;
             }
-        });
+
+            document.getElementById('editStatus').innerText = 'Editando post...';
+
+            try {
+                const response = await gapi.client.request({
+                    path: `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts/${postId}`,
+                    method: 'PUT',
+                    body: {
+                        content: content,
+                    },
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                    },
+                });
+
+                if (response.status === 200) {
+                    document.getElementById('editStatus').innerText = 'Post Editado Exitosamente: ' + response.result.url;
+                } else {
+                    document.getElementById('editStatus').innerText = 'Error al Editar Post: ' + response.status + ' ' + response.statusText;
+                    console.error('Error al editar post:', response);
+                }
+            } catch (error) {
+                document.getElementById('editStatus').innerText = 'Error al Editar Post: ' + error.message;
+                console.error('Error al editar post:', error);
+            }
+        }
+
+        // Inicializar el cliente al cargar la página
+        window.onload = initClient;
     </script>
 </body>
 </html>
