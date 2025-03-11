@@ -49,6 +49,9 @@
                 scope: 'https://www.googleapis.com/auth/blogger'
             }).then(() => {
                 updateAuthStatus();
+            }).**catch(error => { // Añadido manejo de error para initClient
+                console.error("Error al inicializar la API de Google:", error);
+                document.getElementById('authStatus').innerText = 'Error al inicializar la API de Google: ' + error.message;
             });
         }
 
@@ -56,7 +59,8 @@
             return gapi.auth2.getAuthInstance().signIn()
                 .then(() => {
                     updateAuthStatus();
-                }).catch(error => {
+                }).**catch(error => { // Modificado manejo de error en authenticate
+                    console.error("Error durante la autenticación:", error); // Loguea el error completo en la consola
                     document.getElementById('authStatus').innerText = 'Error de Autenticación: ' + error.message;
                 });
         }
