@@ -1,8 +1,8 @@
 /*******************************************
  * Configuración Global
  *******************************************/
-const CLIENT_ID = 'TU_CLIENT_ID';  // ¡Reemplazar!
-const BLOG_ID = 'TU_BLOG_ID';      // ¡Reemplazar!
+const CLIENT_ID = '453533828701-l7rm9i7ved0mg7kvfu0oksq4t9smbakb.apps.googleusercontent.com';  // ¡Reemplazar!
+const BLOG_ID = '3894102744035730320';      // ¡Reemplazar!
 let accessToken = null;
 
 /*******************************************
