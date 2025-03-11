@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Post Manager</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://apis.google.com/js/api.js"></script>
+</head>
+<body>
+    <div class="container my-3">
+        <button id="loginBtn" class="btn btn-outline-dark">Log in with Google</button>
+        <script>
+            const BLOG_ID = '2499792346422287330'; 
+            const OAUTH_CLIENT_ID = '117738437504-k35v9mamlssq1t8062cs4dqn9nlnldc1.apps.googleusercontent.com';
+
+            function authenticate() {
+                return gapi.auth2.getAuthInstance()
+                    .signIn({scope: "https://www.googleapis.com/auth/blogger"})
+                    .then(() => { console.log("Authenticated successfully!"); },
+                          (err) => { console.error("Error during authentication", err); });
+            }
+
+            function loadClient() {
+                return gapi.client.load("https://content.googleapis.com/discovery/v1/apis/blogger/v3/rest")
+                    .then(() => { console.log("API client loaded successfully"); },
+                          (err) => { console.error("Error loading API client", err); });
+            }
+
+            function initClient() {
+                gapi.load("client:auth2", () => {
+                    gapi.auth2.init({client_id: OAUTH_CLIENT_ID})
+                    .then(() => {
+                        console.log("Auth client initialized");
+                    }, (err) => {
+                        console.error("Error initializing client", err);
+                    });
+                });
+            }
+
+            document.getElementById('loginBtn').addEventListener('click', function () {
+                authenticate().then(loadClient);
+            });
+
+            window.onload = function() {
+                initClient();
+            };
+        </script>
+    </div>
+
+    <div class="container my-3">
+        <h1 class="text-center">Manage Blog Posts</h1>
+
+        <!-- Formulario para crear/editar un post -->
+        <form id="postForm" class="mt-4">
+            <div class="mb-3">
+                <label for="postId" class="form-label">Post ID (only for edit/delete)</label>
+                <input type="text" class="form-control" id="postId" placeholder="Leave empty for new post">
+            </div>
+            <div class="mb-3">
+                <label for="postTitle" class="form-label">Title</label>
+                <input type="text" class="form-control" id="postTitle" placeholder="Enter post title" required>
+            </div>
+            <div class="mb-3">
+                <label for="postContent" class="form-label">Content</label>
+                <textarea class="form-control" id="postContent" rows="5" placeholder="Enter post content" required></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="postLabels" class="form-label">Labels (comma-separated)</label>
+                <input type="text" class="form-control" id="postLabels" placeholder="Enter post labels">
+            </div>
+            <button type="submit" class="btn btn-primary" id="createBtn">Create Post</button>
+            <button type="button" class="btn btn-success" id="editBtn">Edit Post</button>
+            <button type="button" class="btn btn-danger" id="deleteBtn">Delete Post</button>
+        </form>
+
+        <!-- Resultado de la operación -->
+        <div id="result" class="mt-4"></div>
+    </div>
+
+    <script>
+        const BLOG_ID = '2499792346422287330'; // Reemplaza con tu Blog ID real
+        const OAUTH_CLIENT_ID = '117738437504-k35v9mamlssq1t8062cs4dqn9nlnldc1.apps.googleusercontent.com'; // Coloca aquí tu Client ID de OAuth
+    
+        // Inicializa la autenticación OAuth 2.0
+        function authenticate() {
+            return gapi.auth2.getAuthInstance()
+                .signIn({scope: "https://www.googleapis.com/auth/blogger"})
+                .then(() => { console.log("Authenticated successfully!"); },
+                      (err) => { console.error("Error during authentication", err); });
+        }
+    
+        // Carga la API del cliente de Google
+        function loadClient() {
+            return gapi.client.load("https://content.googleapis.com/discovery/v1/apis/blogger/v3/rest")
+                .then(() => { console.log("API client loaded successfully"); },
+                      (err) => { console.error("Error loading API client", err); });
+        }
+    
+        // Autentica y carga la API al iniciar la página
+        function initClient() {
+            gapi.load("client:auth2", () => {
+                gapi.auth2.init({client_id: OAUTH_CLIENT_ID});  // Usa tu Client ID de OAuth
+                authenticate().then(loadClient);
+            });
+        }
+    
+        // Crear un nuevo post
+        function createPost(title, content, labels) {
+            gapi.client.blogger.posts.insert({
+                blogId: BLOG_ID,
+                title: title,
+                content: content,
+                labels: labels
+            }).then(response => {
+                document.getElementById('result').textContent = `Post created successfully! ID: ${response.result.id}`;
+            }, error => {
+                document.getElementById('result').textContent = `Error creating post: ${error.message}`;
+            });
+        }
+    
+        // Editar un post existente
+        function editPost(postId, title, content, labels) {
+            gapi.client.blogger.posts.update({
+                blogId: BLOG_ID,
+                postId: postId,
+                title: title,
+                content: content,
+                labels: labels
+            }).then(response => {
+                document.getElementById('result').textContent = `Post edited successfully! ID: ${response.result.id}`;
+            }, error => {
+                document.getElementById('result').textContent = `Error editing post: ${error.message}`;
+            });
+        }
+    
+        // Borrar un post
+        function deletePost(postId) {
+            gapi.client.blogger.posts.delete({
+                blogId: BLOG_ID,
+                postId: postId
+            }).then(() => {
+                document.getElementById('result').textContent = `Post deleted successfully!`;
+            }, error => {
+                document.getElementById('result').textContent = `Error deleting post: ${error.message}`;
+            });
+        }
+    
+        // Event listener para crear post
+        document.getElementById('postForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const postId = document.getElementById('postId').value;
+            const title = document.getElementById('postTitle').value;
+            const content = document.getElementById('postContent').value;
+            const labels = document.getElementById('postLabels').value.split(',');
+    
+            if (!postId) {
+                createPost(title, content, labels);
+            }
+        });
+    
+        // Event listener para editar post
+        document.getElementById('editBtn').addEventListener('click', function () {
+            const postId = document.getElementById('postId').value;
+            const title = document.getElementById('postTitle').value;
+            const content = document.getElementById('postContent').value;
+            const labels = document.getElementById('postLabels').value.split(',');
+    
+            if (postId) {
+                editPost(postId, title, content, labels);
+            } else {
+                alert('Please enter a Post ID to edit.');
+            }
+        });
+    
+        // Event listener para borrar post
+        document.getElementById('deleteBtn').addEventListener('click', function () {
+            const postId = document.getElementById('postId').value;
+    
+            if (postId) {
+                deletePost(postId);
+            } else {
+                alert('Please enter a Post ID to delete.');
+            }
+        });
+    
+        // Cargar la API y autenticar al cargar la página
+        window.onload = function() {
+            initClient();
+        }
+    </script>
+</body>
+</html>
