@@ -1,114 +1,93 @@
 <!DOCTYPE html>
-<html class="dark" lang="es">
+<html lang="es" data-bs-theme="dark">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Google Auth con CSP Ejemplo</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor de Blogger</title>
 
+    <!-- CSP Modificada para Bootstrap -->
     <meta http-equiv="Content-Security-Policy"
           content="
             default-src 'self';
-            script-src 'self' https://apis.google.com https://www.gstatic.com 'unsafe-inline';
-            style-src 'self' https://cdn.tailwindcss.com 'unsafe-inline';
-            connect-src 'self' https://apis.google.com https://www.googleapis.com;
+            script-src 'self' https://apis.google.com https://www.gstatic.com https://cdn.jsdelivr.net;
+            style-src 'self' https://cdn.jsdelivr.net 'unsafe-inline';
+            connect-src 'self' https://www.googleapis.com;
             frame-src 'self' https://accounts.google.com;
-          "
-    />
+            img-src 'self' data:;
+          ">
 
-    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <!-- Bootstrap 5.3.x -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
 
+    <!-- Google API -->
     <script src="https://apis.google.com/js/api.js"></script>
 </head>
-<body class="bg-white dark:bg-gray-900 p-4 font-sans">
-    <div class="max-w-xl mx-auto bg-white p-8 rounded shadow-md">
-        <h1 class="text-2xl font-bold mb-4 text-gray-800">
-            Ejemplo: Autenticación con Google y Blogger
-        </h1>
-        <p class="text-red-500 mb-4 font-semibold">
-            CSP Ajustada para permitir scripts de Google - <strong class="underline">INSEGURO - SOLO EDUCATIVO</strong>
-        </p>
+<body class="bg-body-tertiary">
+    <div class="container">
+        <div class="row justify-content-center mt-5">
+            <div class="col-12 col-md-8">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white">
+                        <h1 class="h4 mb-0">Editor de Blogger</h1>
+                    </div>
+                    
+                    <div class="card-body">
+                        <!-- Sección Autenticación -->
+                        <div id="auth-section">
+                            <button onclick="authenticate()" 
+                                    class="btn btn-success w-100 mb-3">
+                                <i class="bi bi-google me-2"></i>Iniciar Sesión con Google
+                            </button>
+                            <div id="authStatus" class="text-muted small"></div>
+                        </div>
 
-        <div id="auth-section" class="mb-6">
-            <button
-                onclick="authenticate()"
-                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-            >
-                1. Iniciar Sesión con Google
-            </button>
-            <div id="authStatus" class="mt-2 text-sm text-gray-700 italic"></div>
-        </div>
+                        <!-- Editor (oculto inicialmente) -->
+                        <div id="editor-section" class="d-none">
+                            <div class="mb-3">
+                                <label for="postId" class="form-label">ID del Post</label>
+                                <input type="text" id="postId" class="form-control" 
+                                       placeholder="Obligatorio para Editar/Borrar">
+                            </div>
 
-        <div id="editor-section" class="hidden">
-            <h2 class="text-xl font-semibold mb-4 text-gray-800">
-                Crear / Editar / Borrar Post
-            </h2>
+                            <div class="mb-3">
+                                <label for="postTitle" class="form-label">Título</label>
+                                <input type="text" id="postTitle" class="form-control">
+                            </div>
 
-            <div class="mb-4">
-                <label for="postId" class="block text-gray-700 text-sm font-bold mb-2">
-                    ID del Post:
-                </label>
-                <input
-                    type="text"
-                    id="postId"
-                    placeholder="(Necesario para Editar/Borrar)"
-                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                />
+                            <div class="mb-4">
+                                <label for="postContent" class="form-label">Contenido</label>
+                                <textarea id="postContent" rows="6" class="form-control"></textarea>
+                            </div>
+
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <button onclick="createPost()" 
+                                        id="createButton" 
+                                        disabled
+                                        class="btn btn-success">
+                                    Crear
+                                </button>
+                                
+                                <button onclick="editPost()" 
+                                        id="editButton" 
+                                        disabled
+                                        class="btn btn-warning">
+                                    Editar
+                                </button>
+                                
+                                <button onclick="deletePost()" 
+                                        id="deleteButton" 
+                                        disabled
+                                        class="btn btn-danger">
+                                    Borrar
+                                </button>
+                            </div>
+                            
+                            <div id="editorStatus" class="mt-3 small"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
-
-            <div class="mb-4">
-                <label for="postTitle" class="block text-gray-700 text-sm font-bold mb-2">
-                    Título del Post:
-                </label>
-                <input
-                    type="text"
-                    id="postTitle"
-                    placeholder="Título del Post"
-                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                />
-            </div>
-
-            <div class="mb-6">
-                <label for="postContent" class="block text-gray-700 text-sm font-bold mb-2">
-                    Contenido del Post:
-                </label>
-                <textarea
-                    id="postContent"
-                    placeholder="Escribe aquí el contenido..."
-                    rows="6"
-                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                ></textarea>
-            </div>
-
-            <div class="flex flex-col gap-3 sm:flex-row sm:gap-4">
-                <button
-                    onclick="createPost()"
-                    id="createButton"
-                    disabled
-                    class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50"
-                >
-                    Crear Post
-                </button>
-
-                <button
-                    onclick="editPost()"
-                    id="editButton"
-                    disabled
-                    class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50"
-                >
-                    Editar Post
-                </button>
-
-                <button
-                    onclick="deletePost()"
-                    id="deleteButton"
-                    disabled
-                    class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50"
-                >
-                    Borrar Post
-                </button>
-            </div>
-
-            <div id="editorStatus" class="mt-4 text-sm text-gray-700 italic"></div>
         </div>
     </div>
 
