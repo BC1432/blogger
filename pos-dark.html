@@ -3,109 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema POS</title>
+    <title>Sistema POS - Dark Mode</title>
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        :root[data-theme="dark"] {
-            --bg-color: #121212;
-            --text-color: #e0e0e0;
-            --card-bg: #1e1e1e;
-            --card-border: #333;
-            --card-hover: #2d2d2d;
-            --input-bg: #2d2d2d;
-            --panel-bg: #1a1a1a;
-        }
-        
-        :root[data-theme="light"] {
-            --bg-color: #ffffff;
-            --text-color: #212529;
-            --card-bg: #ffffff;
-            --card-border: #dee2e6;
-            --card-hover: #f8f9fa;
-            --input-bg: #ffffff;
-            --panel-bg: #f8f9fa;
-        }
-        
         body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            background-color: #121212;
+            color: #e0e0e0;
         }
         .product-card {
             transition: transform 0.2s;
-            background-color: var(--card-bg);
-            border: 1px solid var(--card-border);
-            color: var(--text-color);
+            background-color: #1e1e1e;
+            border: 1px solid #333;
+            color: #ffffff;
         }
         .product-card .card-title {
-            color: var(--text-color);
+            color: #ffffff;
         }
         .product-card .card-text {
-            color: var(--text-color);
+            color: #e0e0e0;
         }
         .product-card:hover {
             transform: translateY(-5px);
-            background-color: var(--card-hover);
+            background-color: #2d2d2d;
         }
         .cart-item {
-            border-bottom: 1px solid var(--card-border);
+            border-bottom: 1px solid #333;
             padding: 10px 0;
         }
         #cart-panel {
             height: calc(100vh - 56px);
             overflow-y: auto;
-            background-color: var(--panel-bg) !important;
+            background-color: #1a1a1a !important;
         }
         .bg-light {
-            background-color: var(--panel-bg) !important;
+            background-color: #1a1a1a !important;
         }
         .list-group-item {
-            background-color: var(--card-bg);
-            border-color: var(--card-border);
-            color: var(--text-color);
+            background-color: #1e1e1e;
+            border-color: #333;
+            color: #e0e0e0;
         }
         .list-group-item:hover {
-            background-color: var(--card-hover);
-            color: var(--text-color);
+            background-color: #2d2d2d;
+            color: #ffffff;
         }
         .list-group-item.active {
             background-color: #0d6efd;
             border-color: #0d6efd;
         }
         .border-end, .border-start, .border-top {
-            border-color: var(--card-border) !important;
+            border-color: #333 !important;
         }
         .modal-content {
-            background-color: var(--card-bg);
-            border-color: var(--card-border);
+            background-color: #1e1e1e;
+            border-color: #333;
         }
         .modal-header {
-            border-bottom-color: var(--card-border);
+            border-bottom-color: #333;
         }
         .modal-footer {
-            border-top-color: var(--card-border);
+            border-top-color: #333;
         }
         .form-control, .form-select {
-            background-color: var(--input-bg);
-            border-color: var(--card-border);
-            color: var(--text-color);
+            background-color: #2d2d2d;
+            border-color: #333;
+            color: #e0e0e0;
         }
         .form-control:focus, .form-select:focus {
-            background-color: var(--input-bg);
+            background-color: #2d2d2d;
             border-color: #0d6efd;
-            color: var(--text-color);
+            color: #e0e0e0;
         }
     </style>
 </head>
 <body>
     <nav class="navbar navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">POS System</a>
-            <button id="theme-toggle" class="btn btn-outline-light">
-                <i class="bi bi-sun-fill theme-icon-light"></i>
-                <i class="bi bi-moon-fill theme-icon-dark d-none"></i>
-            </button>
+            <a class="navbar-brand" href="#">POS System - Dark Mode</a>
         </div>
     </nav>
 

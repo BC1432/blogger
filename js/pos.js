@@ -8,8 +8,23 @@ const products = [
     { id: 6, name: 'Helado', price: 30.00, category: 'postres', image: 'https://placehold.co/600x400' }
 ];
 
-// Estado del carrito
+// Estado del carrito y tema
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
+let currentTheme = localStorage.getItem('theme') || 'dark';
+document.documentElement.setAttribute('data-theme', currentTheme);
+
+// Función para actualizar los iconos del tema
+function updateThemeIcons(theme) {
+    const lightIcon = document.querySelector('.theme-icon-light');
+    const darkIcon = document.querySelector('.theme-icon-dark');
+    if (theme === 'dark') {
+        lightIcon.classList.remove('d-none');
+        darkIcon.classList.add('d-none');
+    } else {
+        lightIcon.classList.add('d-none');
+        darkIcon.classList.remove('d-none');
+    }
+}
 
 // Elementos del DOM
 const productsContainer = document.getElementById('products-container');
@@ -27,6 +42,17 @@ const categoriesList = document.getElementById('categories-list');
 
 // Funciones de utilidad
 const formatCurrency = (amount) => `$${amount.toFixed(2)}`;
+
+// Inicializar tema
+updateThemeIcons(currentTheme);
+
+// Manejar cambio de tema
+document.getElementById('theme-toggle').addEventListener('click', () => {
+    currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', currentTheme);
+    localStorage.setItem('theme', currentTheme);
+    updateThemeIcons(currentTheme);
+});
 
 // Renderizar productos
 function renderProducts(category = 'all') {
@@ -126,6 +152,8 @@ function updateCart() {
 }
 
 // Manejo de pagos
+const orderDetailsModal = new bootstrap.Modal(document.getElementById('orderDetailsModal'));
+
 checkoutBtn.addEventListener('click', () => {
     if (cart.length === 0) {
         alert('El carrito está vacío');
@@ -134,9 +162,11 @@ checkoutBtn.addEventListener('click', () => {
     paymentModal.show();
 });
 
-paymentMethod.addEventListener('change', () => {
-    document.getElementById('cash-payment-section').style.display = 
-        paymentMethod.value === 'cash' ? 'block' : 'none';
+document.querySelectorAll('input[name="payment-method"]').forEach(radio => {
+    radio.addEventListener('change', () => {
+        document.getElementById('cash-payment-section').style.display = 
+            radio.value === 'cash' ? 'block' : 'none';
+    });
 });
 
 receivedAmount.addEventListener('input', () => {
@@ -149,32 +179,119 @@ receivedAmount.addEventListener('input', () => {
 confirmPaymentBtn.addEventListener('click', () => {
     const total = parseFloat(totalElement.textContent.replace('$', ''));
     const received = parseFloat(receivedAmount.value) || 0;
+    const selectedPayment = document.querySelector('input[name="payment-method"]:checked').value;
 
-    if (paymentMethod.value === 'cash' && received < total) {
+    if (selectedPayment === 'cash' && received < total) {
         alert('El monto recibido es insuficiente');
         return;
     }
 
-    // Procesar el pago
-    alert('¡Pago procesado con éxito!');
+    // Mostrar detalle de la orden
+    showOrderDetails();
+    paymentModal.hide();
+    orderDetailsModal.show();
+
+    // Limpiar el carrito después de mostrar el detalle
     cart = [];
     updateCart();
-    paymentModal.hide();
     receivedAmount.value = '';
+});
+
+// Manejo del tema
+function initializeTheme() {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    updateThemeIcons(savedTheme);
+}
+
+function updateThemeIcons(theme) {
+    const lightIcon = document.querySelector('.theme-icon-light');
+    const darkIcon = document.querySelector('.theme-icon-dark');
+    if (theme === 'dark') {
+        lightIcon.classList.add('d-none');
+        darkIcon.classList.remove('d-none');
+    } else {
+        lightIcon.classList.remove('d-none');
+        darkIcon.classList.add('d-none');
+    }
+}
+
+document.getElementById('theme-toggle').addEventListener('click', () => {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    updateThemeIcons(newTheme);
 });
 
 // Función de inicialización
 function initializeCart() {
-    // Cargar carrito desde localStorage
-    cart = JSON.parse(localStorage.getItem('cart')) || [];
-    // Actualizar la vista del carrito
-    updateCart();
-    // Asegurar que la categoría 'todos' esté activa por defecto
-    document.querySelector('.list-group-item[data-category="all"]')?.classList.add('active');
+    // Renderizar productos iniciales
+    renderProducts();
+    
+    // Actualizar vista del carrito si hay items en localStorage
+    if (cart.length > 0) {
+        updateCart();
+    }
 }
 
-// Inicializar el carrito cuando se carga la página
+// Inicializar cuando se carga la página
 document.addEventListener('DOMContentLoaded', () => {
+    initializeTheme();
     initializeCart();
-    renderProducts();
 });
+
+function showOrderDetails() {
+    const orderDetails = document.getElementById('order-details');
+    const subtotal = parseFloat(subtotalElement.textContent.replace('$', ''));
+    const tax = parseFloat(taxElement.textContent.replace('$', ''));
+    const total = parseFloat(totalElement.textContent.replace('$', ''));
+    const paymentMethod = document.querySelector('input[name="payment-method"]:checked').value;
+    const received = parseFloat(receivedAmount.value) || 0;
+
+    orderDetails.innerHTML = `
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Precio</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${cart.map(item => `
+                        <tr>
+                            <td>${item.name}</td>
+                            <td>${item.quantity}</td>
+                            <td>${formatCurrency(item.price)}</td>
+                            <td>${formatCurrency(item.price * item.quantity)}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3" class="text-end">Subtotal:</td>
+                        <td>${formatCurrency(subtotal)}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" class="text-end">ITBIS (18%):</td>
+                        <td>${formatCurrency(tax)}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" class="text-end"><strong>Total:</strong></td>
+                        <td><strong>${formatCurrency(total)}</strong></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        <div class="mt-3">
+            <p><strong>Método de Pago:</strong> ${paymentMethod}</p>
+            ${paymentMethod === 'cash' ? `
+                <p><strong>Monto Recibido:</strong> ${formatCurrency(received)}</p>
+                <p><strong>Cambio:</strong> ${formatCurrency(Math.max(0, received - total))}</p>
+            ` : ''}
+        </div>
+    `;
+}
