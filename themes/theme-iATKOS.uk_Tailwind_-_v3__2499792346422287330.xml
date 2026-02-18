@@ -87,13 +87,7 @@
       html:not(.dark) .comment-thread a { color: #2563eb; }
     ]]></b:skin>
 
-    <!-- Related Posts Script -->
-    <script type='text/javascript'>
-      //<![CDATA[
-      var relatedpoststitle="";
-      var relatedTitles=new Array();var relatedTitlesNum=0;var relatedUrls=new Array();function related_results_labels(c){for(var b=0;b<c.feed.entry.length;b++){var d=c.feed.entry[b];relatedTitles[relatedTitlesNum]=d.title.$t;for(var a=0;a<d.link.length;a++){if(d.link[a].rel=="alternate"){relatedUrls[relatedTitlesNum]=d.link[a].href;relatedTitlesNum++;break}}}}function removeRelatedDuplicates(){var b=new Array(0);var c=new Array(0);for(var a=0;a<relatedUrls.length;a++){if(!contains(b,relatedUrls[a])){b.length+=1;b[b.length-1]=relatedUrls[a];c.length+=1;c[c.length-1]=relatedTitles[a]}}relatedTitles=c;relatedUrls=b}function contains(b,d){for(var c=0;c<b.length;c++){if(b[c]==d){return true}}return false}function printRelatedLabels(a){for(var b=0;b<relatedUrls.length;b++){if(relatedUrls[b]==a){relatedUrls.splice(b,1);relatedTitles.splice(b,1)}}var c=Math.floor((relatedTitles.length-1)*Math.random());var b=0;if(relatedTitles.length>1){document.write("<h3 class='text-lg font-semibold text-slate-200 mt-6 mb-3'>Related Posts</h3>")}document.write("<ul class='space-y-2'>");while(b<relatedTitles.length&&b<20&&b<maxresults){document.write('<li><a class="text-blue-400 hover:text-blue-300 text-sm" href="'+relatedUrls[c]+'">'+relatedTitles[c]+"</a></li>");if(c<relatedTitles.length-1){c++}else{c=0}b++}document.write("</ul>");relatedUrls.splice(0,relatedUrls.length);relatedTitles.splice(0,relatedTitles.length)};
-      //]]>
-    </script>
+    <!-- Related Posts now handled via JSON feed in post template -->
 
     <b:include data='blog' name='google-analytics'/>
 
@@ -139,7 +133,7 @@
       <div class='flex items-center gap-2'>
         <!-- Trend Dropdown -->
         <div class='relative hidden md:block' id='trendDropdown'>
-          <button class='flex items-center gap-1 text-slate-400 hover:text-white text-sm font-medium px-3 py-2 rounded-lg hover:bg-slate-800 transition-colors' onclick='document.getElementById("trendMenu").classList.toggle("hidden")' type='button'>
+          <button class='flex items-center gap-1 text-slate-400 hover:text-white text-sm font-medium px-3 py-2 rounded-lg hover:bg-slate-800 transition-colors' onclick='document.getElementById(&quot;trendMenu&quot;).classList.toggle(&quot;hidden&quot;)' type='button'>
             <svg class='w-4 h-4' fill='none' stroke='currentColor' stroke-width='2' viewBox='0 0 24 24'><path d='M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z' stroke-linecap='round' stroke-linejoin='round'/><path d='M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z' stroke-linecap='round' stroke-linejoin='round'/></svg>
             Trend
             <svg class='w-3 h-3' fill='none' stroke='currentColor' stroke-width='2' viewBox='0 0 24 24'><path d='m6 9 6 6 6-6'/></svg>
@@ -170,9 +164,9 @@
         <!-- Theme Toggle -->
         <button class='text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800 transition-colors' id='themeToggle' title='Toggle light/dark mode' type='button'>
           <!-- Moon icon (shown in dark mode) -->
-          <svg class='w-5 h-5' id='moonIcon' fill='none' stroke='currentColor' stroke-width='2' viewBox='0 0 24 24'><path d='M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z' stroke-linecap='round' stroke-linejoin='round'/></svg>
+          <svg class='w-5 h-5' fill='none' id='moonIcon' stroke='currentColor' stroke-width='2' viewBox='0 0 24 24'><path d='M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z' stroke-linecap='round' stroke-linejoin='round'/></svg>
           <!-- Sun icon (shown in light mode, hidden by default) -->
-          <svg class='w-5 h-5 hidden' id='sunIcon' fill='none' stroke='currentColor' stroke-width='2' viewBox='0 0 24 24'><circle cx='12' cy='12' r='5'/><path d='M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42' stroke-linecap='round' stroke-linejoin='round'/></svg>
+          <svg class='w-5 h-5 hidden' fill='none' id='sunIcon' stroke='currentColor' stroke-width='2' viewBox='0 0 24 24'><circle cx='12' cy='12' r='5'/><path d='M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42' stroke-linecap='round' stroke-linejoin='round'/></svg>
         </button>
 
         <!-- Get Started -->
@@ -182,9 +176,9 @@
         </a>
         <a class='md:hidden bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium px-3 py-1.5 rounded-lg' href='/search/label/distro?max-results=12'>Start</a>
 
-        <!-- User Dropdown -->
+        <!-- User Dropdown 
         <div class='relative hidden md:block' id='userDropdown'>
-          <button class='text-slate-400 hover:text-white p-1.5 rounded-full hover:bg-slate-800 transition-colors' onclick='document.getElementById("userMenu").classList.toggle("hidden")' type='button'>
+          <button class='text-slate-400 hover:text-white p-1.5 rounded-full hover:bg-slate-800 transition-colors' onclick='document.getElementById(&quot;userMenu&quot;).classList.toggle(&quot;hidden&quot;)' type='button'>
             <svg class='w-6 h-6' fill='currentColor' viewBox='0 0 24 24'><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z'/></svg>
           </button>
           <div class='hidden absolute right-0 mt-1 w-44 bg-slate-800 border border-slate-700 rounded-lg shadow-xl z-50 py-1' id='userMenu'>
@@ -198,7 +192,7 @@
               Logout
             </a>
           </div>
-        </div>
+        </div>-->
       </div>
     </nav>
 
@@ -293,7 +287,7 @@
             <p class='px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2'>Filters</p>
             <nav class='space-y-1'>
               <!-- iATKOS Collapsible -->
-              <button class='flex items-center justify-between w-full px-3 py-1.5 text-sm text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors' onclick='this.nextElementSibling.classList.toggle("hidden");this.querySelector(".chevron").classList.toggle("rotate-90")' type='button'>
+              <button class='flex items-center justify-between w-full px-3 py-1.5 text-sm text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors' onclick='this.nextElementSibling.classList.toggle(&quot;hidden&quot;);this.querySelector(&quot;.chevron&quot;).classList.toggle(&quot;rotate-90&quot;)' type='button'>
                 <span>iATKOS</span>
                 <svg class='w-3 h-3 chevron transition-transform' fill='none' stroke='currentColor' stroke-width='2' viewBox='0 0 24 24'><path d='m9 18 6-6-6-6'/></svg>
               </button>
@@ -313,7 +307,7 @@
               </div>
 
               <!-- Niresh Collapsible -->
-              <button class='flex items-center justify-between w-full px-3 py-1.5 text-sm text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors' onclick='this.nextElementSibling.classList.toggle("hidden");this.querySelector(".chevron").classList.toggle("rotate-90")' type='button'>
+              <button class='flex items-center justify-between w-full px-3 py-1.5 text-sm text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors' onclick='this.nextElementSibling.classList.toggle(&quot;hidden&quot;);this.querySelector(&quot;.chevron&quot;).classList.toggle(&quot;rotate-90&quot;)' type='button'>
                 <span>Niresh</span>
                 <svg class='w-3 h-3 chevron transition-transform' fill='none' stroke='currentColor' stroke-width='2' viewBox='0 0 24 24'><path d='m9 18 6-6-6-6'/></svg>
               </button>
@@ -464,9 +458,6 @@
               </b:includable>
             </b:widget>
             <b:widget id='HTML3' locked='false' title='' type='HTML' version='2' visible='true'>
-              <b:widget-settings>
-                <b:widget-setting name='content'/>
-              </b:widget-settings>
               <b:includable id='main'>
                 <b:include name='widget-title'/>
                 <div class='widget-content'>
@@ -479,7 +470,7 @@
           <!-- Footer in sidebar -->
           <div class='px-3 pt-4 border-t border-slate-800'>
             <p class='text-xs text-slate-600'>
-              <a class='hover:text-slate-400' href='/p/legal.html'>&#169; iATKOS <span id='sidebarYear'></span></a>
+              <a class='hover:text-slate-400' href='/p/legal.html'>&#169; iATKOS <span id='sidebarYear'/></a>
             </p>
           </div>
 
@@ -490,11 +481,62 @@
       <div class='flex-1 md:ml-64'>
         <main class='max-w-5xl mx-auto px-4 py-6'>
 
+          <!-- ============ TRENDING GUIDES OF THE WEEK ============ -->
+          <b:if cond='data:blog.pageType == &quot;index&quot;'>
+            <div class='mb-6' id='trending-guides'>
+              <h2 class='text-lg font-semibold text-slate-200 mb-4 flex items-center gap-2'>
+                <svg class='w-5 h-5 text-yellow-500' fill='currentColor' viewBox='0 0 24 24'><path d='M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z'/></svg>
+                Trending This Week
+              </h2>
+              <div class='grid grid-cols-2 md:grid-cols-3 gap-3' id='trending-guides-grid'>
+                <div class='col-span-full text-sm text-slate-500 text-center py-4'>Loading guides...</div>
+              </div>
+            </div>
+            <script type='text/javascript'>
+              //<![CDATA[
+              (function(){
+                var now=Date.now(), weekAgo=now-7*24*60*60*1000;
+                fetch("/feeds/posts/default/-/guide?alt=json&max-results=20&orderby=updated")
+                  .then(function(r){return r.json()})
+                  .then(function(data){
+                    var entries=data.feed.entry||[];
+                    var posts=[];
+                    entries.forEach(function(entry){
+                      var url="",published=new Date(entry.published.$t).getTime();
+                      for(var i=0;i<entry.link.length;i++){
+                        if(entry.link[i].rel=="alternate"){url=entry.link[i].href;break;}
+                      }
+                      var snippet="";
+                      if(entry.summary)snippet=entry.summary.$t||"";
+                      var comments=0;
+                      if(entry.thr$total)comments=parseInt(entry.thr$total.$t)||0;
+                      posts.push({t:entry.title.$t,u:url,s:snippet,c:comments,p:published});
+                    });
+                    // Sort by comment count (proxy for popularity), then by recency
+                    posts.sort(function(a,b){return b.c-a.c||b.p-a.p;});
+                    var grid=document.getElementById("trending-guides-grid");
+                    var html="";
+                    for(var i=0;i<Math.min(6,posts.length);i++){
+                      html+='<a class="block bg-slate-900 hover:bg-slate-800/80 border border-slate-800 rounded-lg p-4 transition-colors group" href="'+posts[i].u+'">';
+                      html+='<h3 class="text-sm font-medium text-slate-200 group-hover:text-blue-400 line-clamp-2 transition-colors">'+posts[i].t+'</h3>';
+                      if(posts[i].s)html+='<p class="text-xs text-slate-500 mt-2 line-clamp-2">'+posts[i].s.substring(0,120)+'</p>';
+                      html+='</a>';
+                    }
+                    if(html)grid.innerHTML=html;
+                    else grid.innerHTML='<p class="col-span-full text-sm text-slate-500 text-center py-4">No trending guides this week.</p>';
+                  }).catch(function(){
+                    var grid=document.getElementById("trending-guides-grid");
+                    if(grid)grid.innerHTML='<p class="col-span-full text-sm text-slate-500 text-center py-4">Could not load guides.</p>';
+                  });
+              })();
+              //]]>
+            </script>
+          </b:if>
+
           <!-- Main Blog Section -->
           <b:section class='' id='main' showaddelement='no'>
             <b:widget id='Blog1' locked='true' title='Blog Posts' type='Blog' version='1'>
               <b:widget-settings>
-                <b:widget-setting name='commentLabel'>comments</b:widget-setting>
                 <b:widget-setting name='showShareButtons'>false</b:widget-setting>
                 <b:widget-setting name='authorLabel'>By</b:widget-setting>
                 <b:widget-setting name='style.unittype'>TextAndImage</b:widget-setting>
@@ -511,7 +553,7 @@
                 <b:widget-setting name='style.textcolor'>#ffffff</b:widget-setting>
                 <b:widget-setting name='showCommentLink'>true</b:widget-setting>
                 <b:widget-setting name='style.urlcolor'>#ffffff</b:widget-setting>
-                <b:widget-setting name='postLocationLabel'>Location:</b:widget-setting>
+                <b:widget-setting name='postLocationLabel'>Ubicación:</b:widget-setting>
                 <b:widget-setting name='showAuthor'>false</b:widget-setting>
                 <b:widget-setting name='style.linkcolor'>#ffffff</b:widget-setting>
                 <b:widget-setting name='style.bgcolor'>#ffffff</b:widget-setting>
@@ -521,8 +563,6 @@
                 <b:widget-setting name='showInlineAds'>true</b:widget-setting>
                 <b:widget-setting name='showReactions'>false</b:widget-setting>
               </b:widget-settings>
-
-              <!-- ===== MAIN INCLUDABLE ===== -->
               <b:includable id='main' var='top'>
 
                 <!-- Ad above posts (post pages only) -->
@@ -553,9 +593,29 @@
                   </b:if>
                 </div>
 
-              </b:includable>
+                <!-- Index Pagination (set posts per page to 10 in Blogger Settings > Posts) -->
+                <b:if cond='data:blog.pageType == &quot;index&quot;'>
+                  <nav class='flex items-center justify-center gap-3 my-8 py-4'>
+                    <b:if cond='data:newerPageUrl'>
+                      <a class='flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-medium px-5 py-2.5 rounded-lg transition-colors border border-slate-700' expr:href='data:newerPageUrl'>
+                        <svg class='w-4 h-4' fill='none' stroke='currentColor' stroke-width='2' viewBox='0 0 24 24'><polyline points='15 18 9 12 15 6'/></svg>
+                        Newer Posts
+                      </a>
+                    </b:if>
+                    <a class='flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-medium px-5 py-2.5 rounded-lg transition-colors border border-slate-700' expr:href='data:blog.homepageUrl'>
+                      <svg class='w-4 h-4' fill='none' stroke='currentColor' stroke-width='2' viewBox='0 0 24 24'><path d='m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'/></svg>
+                      Home
+                    </a>
+                    <b:if cond='data:olderPageUrl'>
+                      <a class='flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-medium px-5 py-2.5 rounded-lg transition-colors border border-slate-700' expr:href='data:olderPageUrl'>
+                        Older Posts
+                        <svg class='w-4 h-4' fill='none' stroke='currentColor' stroke-width='2' viewBox='0 0 24 24'><polyline points='9 18 15 12 9 6'/></svg>
+                      </a>
+                    </b:if>
+                  </nav>
+                </b:if>
 
-              <!-- ===== BACKLINK DELETE ICON ===== -->
+              </b:includable>
               <b:includable id='backlinkDeleteIcon' var='backlink'>
                 <span expr:class='&quot;item-control &quot; + data:backlink.adminClass'>
                   <a expr:href='data:backlink.deleteUrl' expr:title='data:top.deleteBacklinkMsg'>
@@ -563,8 +623,6 @@
                   </a>
                 </span>
               </b:includable>
-
-              <!-- ===== BACKLINKS ===== -->
               <b:includable id='backlinks' var='post'>
                 <a name='links'/>
                 <h4><data:post.backlinksLabel/></h4>
@@ -590,8 +648,6 @@
                   <a class='comment-link' expr:href='data:post.createLinkUrl' expr:id='data:widget.instanceId + &quot;_backlinks-create-link&quot;' target='_blank'><data:post.createLinkLabel/></a>
                 </p>
               </b:includable>
-
-              <!-- ===== COMMENT FORM ===== -->
               <b:includable id='comment-form' var='post'>
                 <div class='comment-form'>
                   <a name='comment-form'/>
@@ -615,8 +671,6 @@
                   <script type='text/javascript'>BLOG_CMT_createIframe(&#39;<data:post.appRpcRelayPath/>&#39;, &#39;<data:post.communityId/>&#39;);</script>
                 </div>
               </b:includable>
-
-              <!-- ===== COMMENT DELETE ICON ===== -->
               <b:includable id='commentDeleteIcon' var='comment'>
                 <span expr:class='&quot;item-control &quot; + data:comment.adminClass'>
                   <b:if cond='data:showCmtPopup'>
@@ -628,8 +682,6 @@
                   </b:if>
                 </span>
               </b:includable>
-
-              <!-- ===== COMMENT COUNT PICKER ===== -->
               <b:includable id='comment_count_picker' var='post'>
                 <b:if cond='data:post.commentSource == 1'>
                   <span class='cmt_count_iframe_holder' expr:data-count='data:post.numComments' expr:data-onclick='data:post.addCommentOnclick' expr:data-post-url='data:post.url' expr:data-url='data:post.canonicalUrl'/>
@@ -639,8 +691,6 @@
                   </a>
                 </b:if>
               </b:includable>
-
-              <!-- ===== COMMENT PICKER ===== -->
               <b:includable id='comment_picker' var='post'>
                 <b:if cond='data:post.commentSource == 1'>
                   <b:include data='post' name='iframe_comments'/>
@@ -652,8 +702,6 @@
                   </b:if>
                 </b:if>
               </b:includable>
-
-              <!-- ===== COMMENTS (Non-threaded) ===== -->
               <b:includable id='comments' var='post'>
                 <div class='mt-8 bg-slate-900 rounded-xl p-6' id='comments'>
                   <b:if cond='data:post.allowComments'>
@@ -730,23 +778,55 @@
                     </div>
                   </div>
 
-                  <!-- Related Posts -->
+                  <!-- Related Posts (JSON Feed) -->
                   <b:if cond='data:blog.pageType == &quot;item&quot;'>
                     <div class='mt-6 pt-6 border-t border-slate-800' id='related-posts'>
+                      <h3 class='text-lg font-semibold text-slate-200 mb-3'>Related Posts</h3>
+                      <div class='grid grid-cols-2 md:grid-cols-3 gap-3' id='related-posts-grid'/>
+                      <script type='text/javascript'>
+                        var rpCurrentUrl = &quot;<data:post.url/>&quot;;
+                        var rpCurrentLabels = [];
+                      </script>
                       <b:loop values='data:post.labels' var='label'>
-                        <script expr:src='&quot;/feeds/posts/default/-/&quot; + data:label.name + &quot;?alt=json-in-script&amp;callback=related_results_labels&amp;max-results=3&quot;' type='text/javascript'/>
+                        <script type='text/javascript'>rpCurrentLabels.push(&quot;<data:label.name/>&quot;);</script>
                       </b:loop>
                       <script type='text/javascript'>
-                        var maxresults=5;
-                        removeRelatedDuplicates(); printRelatedLabels(&quot;<data:post.url/>&quot;);
+                        //<![CDATA[
+                        (function(){
+                          fetch("https://www.iatkos.uk/feeds/posts/summary/?alt=json&max-results=50")
+                            .then(function(r){return r.json()})
+                            .then(function(data){
+                              var entries=data.feed.entry||[];
+                              var related=[];
+                              entries.forEach(function(entry){
+                                var url="";
+                                for(var i=0;i<entry.link.length;i++){
+                                  if(entry.link[i].rel=="alternate"){url=entry.link[i].href;break;}
+                                }
+                                if(url===rpCurrentUrl)return;
+                                var cats=(entry.category||[]).map(function(c){return c.term;});
+                                var score=0;
+                                rpCurrentLabels.forEach(function(l){if(cats.indexOf(l)!==-1)score++;});
+                                if(score>0)related.push({t:entry.title.$t,u:url,s:score});
+                              });
+                              related.sort(function(a,b){return b.s-a.s;});
+                              var g=document.getElementById("related-posts-grid");
+                              var h="";
+                              for(var i=0;i<Math.min(6,related.length);i++){
+                                h+='<a class="block bg-slate-900 hover:bg-slate-800/80 border border-slate-800 rounded-lg p-3 transition-colors group" href="'+related[i].u+'">';
+                                h+='<h4 class="text-sm font-medium text-slate-300 group-hover:text-blue-400 line-clamp-2 transition-colors">'+related[i].t+'</h4></a>';
+                              }
+                              if(h)g.innerHTML=h;
+                              else document.getElementById("related-posts").style.display="none";
+                            }).catch(function(){});
+                        })();
+                        //]]>
                       </script>
                     </div>
                   </b:if>
 
                 </div>
               </b:includable>
-
-              <!-- ===== FEED LINKS ===== -->
               <b:includable id='feedLinks'>
                 <b:if cond='data:blog.pageType != &quot;item&quot;'>
                   <b:if cond='data:feedLinks'>
@@ -764,7 +844,6 @@
                   </div>
                 </b:if>
               </b:includable>
-
               <b:includable id='feedLinksBody' var='links'>
                 <div class='feed-links text-sm text-slate-500'>
                   <data:feedLinksMsg/>
@@ -775,8 +854,6 @@
                   </b:loop>
                 </div>
               </b:includable>
-
-              <!-- ===== IFRAME COMMENTS ===== -->
               <b:includable id='iframe_comments' var='post'>
                 <b:if cond='data:post.allowIframeComments'>
                   <script expr:src='data:post.iframeCommentSrc' type='text/javascript'/>
@@ -786,8 +863,6 @@
                   </b:if>
                 </b:if>
               </b:includable>
-
-              <!-- ===== INDEX POST (Card in list) ===== -->
               <b:includable id='mobile-index-post' var='post'>
                 <article class='group bg-slate-900 hover:bg-slate-800/80 border border-slate-800 rounded-xl p-4 mb-3 transition-colors'>
                   <div class='flex gap-4'>
@@ -831,8 +906,6 @@
                   </div>
                 </article>
               </b:includable>
-
-              <!-- ===== MOBILE MAIN ===== -->
               <b:includable id='mobile-main' var='top'>
                 <div class='blog-posts hfeed'>
                   <b:include data='top' name='status-message'/>
@@ -848,8 +921,6 @@
                 </div>
                 <b:include name='mobile-nextprev'/>
               </b:includable>
-
-              <!-- ===== MOBILE NEXT/PREV ===== -->
               <b:includable id='mobile-nextprev'>
                 <b:if cond='data:blog.url != data:blog.homepageUrl'>
                   <nav class='flex items-center justify-center gap-2 my-6'>
@@ -874,8 +945,6 @@
                   </nav>
                 </b:if>
               </b:includable>
-
-              <!-- ===== SINGLE POST (Full post page) ===== -->
               <b:includable id='mobile-post' var='post'>
                 <article class='bg-slate-900 border border-slate-800 rounded-xl overflow-hidden'>
 
@@ -978,8 +1047,6 @@
                 </b:if>
 
               </b:includable>
-
-              <!-- ===== NEXT/PREV NAVIGATION ===== -->
               <b:includable id='nextprev'>
                 <b:if cond='data:blog.url != data:blog.homepageUrl'>
                   <nav class='flex items-center justify-center gap-2 my-6'>
@@ -1003,8 +1070,6 @@
                   </nav>
                 </b:if>
               </b:includable>
-
-              <!-- ===== POST (for static/item pages) ===== -->
               <b:includable id='post' var='post'>
                 <b:if cond='data:blog.pageType == &quot;static_page&quot;'>
                   <article class='bg-slate-900 border border-slate-800 rounded-xl p-6'>
@@ -1026,8 +1091,6 @@
                   </article>
                 </b:if>
               </b:includable>
-
-              <!-- ===== POST QUICK EDIT ===== -->
               <b:includable id='postQuickEdit' var='post'>
                 <b:if cond='data:post.editUrl'>
                   <span expr:class='&quot;item-control &quot; + data:post.adminClass'>
@@ -1037,10 +1100,7 @@
                   </span>
                 </b:if>
               </b:includable>
-
               <b:includable id='shareButtons' var='post'/>
-
-              <!-- ===== STATUS MESSAGE ===== -->
               <b:includable id='status-message'>
                 <b:if cond='data:blog.pageType == &quot;archive&quot;'>
                   <div class='bg-slate-800 rounded-lg p-3 mb-4 text-sm text-slate-300'>
@@ -1053,8 +1113,6 @@
                   </div>
                 </b:if>
               </b:includable>
-
-              <!-- ===== THREADED COMMENT FORM ===== -->
               <b:includable id='threaded-comment-form' var='post'>
                 <div class='comment-form mt-4'>
                   <a name='comment-form'/>
@@ -1074,8 +1132,6 @@
                   <script type='text/javascript'>BLOG_CMT_createIframe(&#39;<data:post.appRpcRelayPath/>&#39;);</script>
                 </div>
               </b:includable>
-
-              <!-- ===== THREADED COMMENT JS ===== -->
               <b:includable id='threaded_comment_js' var='post'>
                 <script async='async' expr:src='data:post.commentSrc' type='text/javascript'/>
                 <script type='text/javascript'>
@@ -1089,8 +1145,6 @@ var cursor=null;if(items&&items.length>0){cursor=parseInt(items[items.length-1].
                   })();
                 </script>
               </b:includable>
-
-              <!-- ===== THREADED COMMENTS ===== -->
               <b:includable id='threaded_comments' var='post'>
                 <div class='mt-8 bg-slate-900 border border-slate-800 rounded-xl p-6' id='comments'>
                   <a name='comments'/>
@@ -1126,14 +1180,10 @@ var cursor=null;if(items&&items.length>0){cursor=parseInt(items[items.length-1].
                   </div>
                 </div>
               </b:includable>
-
             </b:widget>
           </b:section>
 
-          <!-- Pagination -->
-          <b:if cond='data:blog.pageType == &quot;index&quot;'>
-            <div class='my-6' id='blog-pager'/>
-          </b:if>
+          <!-- Pagination is now inside Blog1 widget -->
 
         </main>
 
@@ -1141,12 +1191,49 @@ var cursor=null;if(items&&items.length>0){cursor=parseInt(items[items.length-1].
         <footer class='border-t border-slate-800 py-6 px-4'>
           <div class='max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4'>
             <p class='text-xs text-slate-600'>
-              <a class='hover:text-slate-400' href='/p/legal.html'>&#169; iATKOS <span id='footerYear'></span></a> &#183; Not affiliated with Apple, Inc. &#183;
+              <a class='hover:text-slate-400' href='/p/legal.html'>&#169; iATKOS <span id='footerYear'/></a> &#183; Not affiliated with Apple, Inc. &#183;
               <a class='hover:text-slate-400' href='/p/legal.html'>Terms</a>
             </p>
           </div>
         </footer>
 
+      </div>
+    </div>
+
+    <!-- ============ FAB + NEW POST MODAL ============ -->
+    <div class='fixed bottom-6 right-6 z-50' id='fab-container'>
+      <button class='bg-blue-600 hover:bg-blue-700 text-white w-14 h-14 rounded-full shadow-lg shadow-blue-600/25 flex items-center justify-center transition-all hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-500/50' id='fabBtn' title='Ask a question' type='button'>
+        <svg class='w-6 h-6' fill='none' stroke='currentColor' stroke-width='2' viewBox='0 0 24 24'><path d='M12 5v14M5 12h14'/></svg>
+      </button>
+    </div>
+
+    <div class='fixed inset-0 z-[60] hidden items-center justify-center bg-black/60 backdrop-blur-sm' id='newPostModal'>
+      <div class='bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-lg mx-4 shadow-2xl'>
+        <div class='flex items-center justify-between px-6 py-4 border-b border-slate-800'>
+          <h3 class='text-lg font-semibold text-slate-100'>Ask a public question</h3>
+          <button class='text-slate-400 hover:text-slate-100 transition-colors' id='closeModal' type='button'>
+            <svg class='w-5 h-5' fill='none' stroke='currentColor' stroke-width='2' viewBox='0 0 24 24'><path d='M6 18L18 6M6 6l12 12'/></svg>
+          </button>
+        </div>
+        <div class='px-6 py-5 space-y-4'>
+          <div>
+            <label class='block text-sm font-medium text-slate-300 mb-1' for='modal-name'>Title / Name</label>
+            <input class='w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent' id='modal-name' placeholder='Your name or title' type='text'/>
+          </div>
+          <div>
+            <label class='block text-sm font-medium text-slate-300 mb-1' for='modal-email'>Email <span class='text-red-400'>*</span></label>
+            <input class='w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent' id='modal-email' placeholder='your@email.com' type='email'/>
+          </div>
+          <div>
+            <label class='block text-sm font-medium text-slate-300 mb-1' for='modal-message'>Message <span class='text-red-400'>*</span></label>
+            <textarea class='w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none' id='modal-message' placeholder='Describe your question...' rows='5'/>
+          </div>
+          <p class='text-xs text-slate-500' id='modal-error'/>
+        </div>
+        <div class='flex items-center justify-end gap-3 px-6 py-4 border-t border-slate-800'>
+          <button class='text-sm text-slate-400 hover:text-slate-100 px-4 py-2 rounded-lg transition-colors' id='cancelModal' type='button'>Cancel</button>
+          <button class='bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-6 py-2 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500' id='submitModal' type='button'>Submit</button>
+        </div>
       </div>
     </div>
 
@@ -1218,11 +1305,14 @@ var cursor=null;if(items&&items.length>0){cursor=parseInt(items[items.length-1].
                         <b:widget-setting name='copyright'/>
                       </b:widget-settings>
                       <b:includable id='main'>
-                        <div class='widget-content' style='text-align: center;'>
-                          <b:if cond='data:attribution != &quot;&quot;'><data:attribution/></b:if>
-                        </div>
-                        <b:include name='quickedit'/>
-                      </b:includable>
+    <div class='widget-content' style='text-align: center;'>
+      <b:if cond='data:attribution != &quot;&quot;'>
+       <data:attribution/>
+      </b:if>
+    </div>
+
+    <b:include name='quickedit'/>
+  </b:includable>
                     </b:widget>
                   </b:section>
                 </div>
@@ -1310,6 +1400,66 @@ var cursor=null;if(items&&items.length>0){cursor=parseInt(items[items.length-1].
             userMenu.classList.add('hidden');
           }
         });
+
+        // FAB + New Post Modal
+        var fabEl = document.getElementById('fabBtn');
+        var modalEl = document.getElementById('newPostModal');
+        var closeModalEl = document.getElementById('closeModal');
+        var cancelModalEl = document.getElementById('cancelModal');
+        var submitModalEl = document.getElementById('submitModal');
+
+        function openModal() {
+          if (modalEl) { modalEl.classList.remove('hidden'); modalEl.classList.add('flex'); }
+        }
+        function closeModalFn() {
+          if (modalEl) { modalEl.classList.add('hidden'); modalEl.classList.remove('flex'); }
+          var err = document.getElementById('modal-error');
+          if (err) { err.textContent = ''; err.className = 'text-xs text-slate-500'; }
+        }
+
+        if (fabEl) fabEl.addEventListener('click', openModal);
+        if (closeModalEl) closeModalEl.addEventListener('click', closeModalFn);
+        if (cancelModalEl) cancelModalEl.addEventListener('click', closeModalFn);
+        if (modalEl) modalEl.addEventListener('click', function(e) { if (e.target === modalEl) closeModalFn(); });
+
+        // ESC key closes modal
+        document.addEventListener('keydown', function(e) {
+          if (e.key === 'Escape') closeModalFn();
+        });
+
+        if (submitModalEl) {
+          submitModalEl.addEventListener('click', function() {
+            var nameVal = document.getElementById('modal-name').value.trim();
+            var emailVal = document.getElementById('modal-email').value.trim();
+            var msgVal = document.getElementById('modal-message').value.trim();
+            var errEl = document.getElementById('modal-error');
+
+            if (!emailVal) { errEl.textContent = 'Email is required.'; errEl.className = 'text-xs text-red-400'; return; }
+            if (!msgVal) { errEl.textContent = 'Message is required.'; errEl.className = 'text-xs text-red-400'; return; }
+
+            // Wire to Blogger ContactForm2 widget
+            var cf2n = document.getElementById('ContactForm2_contact-form-name');
+            var cf2e = document.getElementById('ContactForm2_contact-form-email');
+            var cf2m = document.getElementById('ContactForm2_contact-form-email-message');
+            var cf2s = document.getElementById('ContactForm2_contact-form-submit');
+
+            if (cf2n) cf2n.value = nameVal;
+            if (cf2e) cf2e.value = emailVal;
+            if (cf2m) cf2m.value = msgVal;
+            if (cf2s) cf2s.click();
+
+            errEl.textContent = 'Sending...';
+            errEl.className = 'text-xs text-green-400';
+
+            setTimeout(function() {
+              closeModalFn();
+              document.getElementById('modal-name').value = '';
+              document.getElementById('modal-email').value = '';
+              document.getElementById('modal-message').value = '';
+              window.location.href = '/search/label/distro?max-results=12';
+            }, 2000);
+          });
+        }
       });
       //]]>
     </script>
@@ -1361,37 +1511,50 @@ var cursor=null;if(items&&items.length>0){cursor=parseInt(items[items.length-1].
   </body>
 
   <!-- ============ SECTION CONTENTS (Required by Blogger) ============ -->
-  <b:section-contents id='sidebar-right-1'>
-    <b:widget id='AdSense2' locked='false' title='' type='AdSense' version='1'>
-      <b:widget-settings>
-        <b:widget-setting name='style.bgcolor'>#ffffff</b:widget-setting>
-        <b:widget-setting name='style.textcolor'>#ffffff</b:widget-setting>
-        <b:widget-setting name='style.layout'>1x1</b:widget-setting>
-        <b:widget-setting name='style.bordercolor'>#ffffff</b:widget-setting>
-        <b:widget-setting name='style.urlcolor'>#ffffff</b:widget-setting>
-        <b:widget-setting name='style.linkcolor'>#ffffff</b:widget-setting>
-        <b:widget-setting name='style.unittype'>TextAndImage</b:widget-setting>
-      </b:widget-settings>
-      <b:includable id='main'>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+<b:section-contents id='sidebar-right-1'>
+  <b:widget id='AdSense2' locked='false' title='' type='AdSense' version='1'>
+    <b:widget-settings>
+      <b:widget-setting name='style.bgcolor'>#ffffff</b:widget-setting>
+      <b:widget-setting name='style.textcolor'>#ffffff</b:widget-setting>
+      <b:widget-setting name='style.layout'>1x1</b:widget-setting>
+      <b:widget-setting name='style.bordercolor'>#ffffff</b:widget-setting>
+      <b:widget-setting name='style.urlcolor'>#ffffff</b:widget-setting>
+      <b:widget-setting name='style.linkcolor'>#ffffff</b:widget-setting>
+      <b:widget-setting name='style.unittype'>TextAndImage</b:widget-setting>
+    </b:widget-settings>
+    <b:includable id='main'>
         <div class='widget-content'><data:adCode/><b:include name='quickedit'/></div>
       </b:includable>
-    </b:widget>
-    <b:widget id='AdSense1' locked='false' title='' type='AdSense' version='1'>
-      <b:includable id='main'>
+  </b:widget>
+  <b:widget id='AdSense1' locked='false' title='' type='AdSense' version='1'>
+    <b:includable id='main'>
         <div class='widget-content'><data:adCode/><b:include name='quickedit'/></div>
       </b:includable>
-    </b:widget>
-    <b:widget id='Header1' locked='false' title='iATKOS | United Kingdom (Header)' type='Header' version='1'>
-      <b:widget-settings>
-        <b:widget-setting name='displayUrl'/>
-        <b:widget-setting name='displayHeight'>0</b:widget-setting>
-        <b:widget-setting name='sectionWidth'>-1</b:widget-setting>
-        <b:widget-setting name='useImage'>false</b:widget-setting>
-        <b:widget-setting name='shrinkToFit'>false</b:widget-setting>
-        <b:widget-setting name='imagePlacement'>BEHIND</b:widget-setting>
-        <b:widget-setting name='displayWidth'>0</b:widget-setting>
-      </b:widget-settings>
-      <b:includable id='main'>
+  </b:widget>
+  <b:widget id='Header1' locked='false' title='iATKOS | United Kingdom (Header)' type='Header' version='1'>
+    <b:widget-settings>
+      <b:widget-setting name='displayUrl'/>
+      <b:widget-setting name='displayHeight'>0</b:widget-setting>
+      <b:widget-setting name='sectionWidth'>-1</b:widget-setting>
+      <b:widget-setting name='useImage'>false</b:widget-setting>
+      <b:widget-setting name='shrinkToFit'>false</b:widget-setting>
+      <b:widget-setting name='imagePlacement'>BEHIND</b:widget-setting>
+      <b:widget-setting name='displayWidth'>0</b:widget-setting>
+    </b:widget-settings>
+    <b:includable id='main'>
         <b:if cond='data:useImage'>
           <b:if cond='data:imagePlacement == &quot;BEHIND&quot;'>
             <b:if cond='data:mobile'>
@@ -1426,22 +1589,22 @@ var cursor=null;if(items&&items.length>0){cursor=parseInt(items[items.length-1].
           </div>
         </b:if>
       </b:includable>
-      <b:includable id='description'>
+    <b:includable id='description'>
         <div class='descriptionwrapper'><p class='description'><span><data:description/></span></p></div>
       </b:includable>
-      <b:includable id='title'>
+    <b:includable id='title'>
         <b:tag cond='data:blog.url != data:blog.homepageUrl' expr:href='data:blog.homepageUrl' name='a'><data:title/></b:tag>
       </b:includable>
-    </b:widget>
-    <b:widget id='Label1' locked='false' title='Labels' type='Label' version='1'>
-      <b:widget-settings>
-        <b:widget-setting name='sorting'>ALPHA</b:widget-setting>
-        <b:widget-setting name='display'>LIST</b:widget-setting>
-        <b:widget-setting name='selectedLabelsList'/>
-        <b:widget-setting name='showType'>ALL</b:widget-setting>
-        <b:widget-setting name='showFreqNumbers'>false</b:widget-setting>
-      </b:widget-settings>
-      <b:includable id='main'>
+  </b:widget>
+  <b:widget id='Label1' locked='false' title='Labels' type='Label' version='1'>
+    <b:widget-settings>
+      <b:widget-setting name='sorting'>ALPHA</b:widget-setting>
+      <b:widget-setting name='display'>LIST</b:widget-setting>
+      <b:widget-setting name='selectedLabelsList'/>
+      <b:widget-setting name='showType'>ALL</b:widget-setting>
+      <b:widget-setting name='showFreqNumbers'>false</b:widget-setting>
+    </b:widget-settings>
+    <b:includable id='main'>
         <b:if cond='data:title != &quot;&quot;'><h2><data:title/></h2></b:if>
         <div expr:class='&quot;widget-content &quot; + data:display + &quot;-label-widget-content&quot;'>
           <b:if cond='data:display == &quot;list&quot;'>
@@ -1468,7 +1631,7 @@ var cursor=null;if(items&&items.length>0){cursor=parseInt(items[items.length-1].
           <b:include name='quickedit'/>
         </div>
       </b:includable>
-      <b:includable id='cloud'>
+    <b:includable id='cloud'>
         <b:loop values='data:labels' var='label'>
           <span class='label-size'><b:class expr:name='&quot;label-size-&quot; + data:label.cssSize'/>
             <a class='label-name' expr:href='data:label.url'><data:label.name/>
@@ -1477,29 +1640,29 @@ var cursor=null;if(items&&items.length>0){cursor=parseInt(items[items.length-1].
           </span>
         </b:loop>
       </b:includable>
-      <b:includable id='content'>
+    <b:includable id='content'>
         <div class='widget-content'><b:class expr:name='data:this.display + &quot;-label-widget-content&quot;'/>
           <b:include cond='data:this.display == &quot;list&quot;' name='list'/>
           <b:include cond='data:this.display == &quot;cloud&quot;' name='cloud'/>
         </div>
       </b:includable>
-      <b:includable id='list'>
+    <b:includable id='list'>
         <ul><b:loop values='data:labels' var='label'><li>
           <a class='label-name' expr:href='data:label.url'><data:label.name/>
             <b:if cond='data:this.showFreqNumbers'><span class='label-count'><data:label.count/></span></b:if>
           </a>
         </li></b:loop></ul>
       </b:includable>
-    </b:widget>
-    <b:widget id='ReportAbuse1' locked='false' title='' type='ReportAbuse'>
-      <b:includable id='main'><b:include name='reportAbuse'/></b:includable>
-    </b:widget>
-    <b:widget cond='!data:view.isPost' id='PageList1' locked='false' title='Pages' type='PageList'>
-      <b:widget-settings>
-        <b:widget-setting name='pageListJson'><![CDATA[{"home":{"href":"http://iatkos-bk.blogspot.com/","position":0,"title":"Home"}}]]></b:widget-setting>
-        <b:widget-setting name='homeTitle'>Home</b:widget-setting>
-      </b:widget-settings>
-      <b:includable id='main'>
+  </b:widget>
+  <b:widget id='ReportAbuse1' locked='false' title='' type='ReportAbuse' version='1'>
+    <b:includable id='main'><b:include name='reportAbuse'/></b:includable>
+  </b:widget>
+  <b:widget cond='!data:view.isPost' id='PageList1' locked='false' title='Pages' type='PageList' version='1'>
+    <b:widget-settings>
+      <b:widget-setting name='pageListJson'><![CDATA[{"home":{"href":"http://iatkos-bk.blogspot.com/","position":0,"title":"Home"}}]]></b:widget-setting>
+      <b:widget-setting name='homeTitle'>Home</b:widget-setting>
+    </b:widget-settings>
+    <b:includable id='main'>
         <b:if cond='data:title != &quot;&quot;'><h2><data:title/></h2></b:if>
         <div class='widget-content'>
           <b:if cond='data:mobile'>
@@ -1527,13 +1690,13 @@ var cursor=null;if(items&&items.length>0){cursor=parseInt(items[items.length-1].
           <b:include name='quickedit'/>
         </div>
       </b:includable>
-    </b:widget>
-    <b:widget id='Profile1' locked='false' title='About Me' type='Profile' version='1'>
-      <b:widget-settings>
-        <b:widget-setting name='showaboutme'>true</b:widget-setting>
-        <b:widget-setting name='showlocation'>false</b:widget-setting>
-      </b:widget-settings>
-      <b:includable id='main'>
+  </b:widget>
+  <b:widget id='Profile1' locked='false' title='About Me' type='Profile' version='1'>
+    <b:widget-settings>
+      <b:widget-setting name='showaboutme'>true</b:widget-setting>
+      <b:widget-setting name='showlocation'>false</b:widget-setting>
+    </b:widget-settings>
+    <b:includable id='main'>
         <b:if cond='data:title != &quot;&quot;'><h2><data:title/></h2></b:if>
         <div class='widget-content'>
           <b:if cond='data:team'>
@@ -1556,20 +1719,20 @@ var cursor=null;if(items&&items.length>0){cursor=parseInt(items[items.length-1].
           <b:include name='quickedit'/>
         </div>
       </b:includable>
-    </b:widget>
-    <b:widget cond='data:view.isHomepage' id='FeaturedPost1' locked='false' title='Featured Post' type='FeaturedPost' version='1'>
-      <b:widget-settings>
-        <b:widget-setting name='showSnippet'>true</b:widget-setting>
-        <b:widget-setting name='showPostTitle'>true</b:widget-setting>
-        <b:widget-setting name='showFirstImage'>true</b:widget-setting>
-        <b:widget-setting name='useMostRecentPost'>true</b:widget-setting>
-      </b:widget-settings>
-      <b:includable id='main'>
+  </b:widget>
+  <b:widget cond='data:view.isHomepage' id='FeaturedPost1' locked='false' title='Featured Post' type='FeaturedPost' version='1'>
+    <b:widget-settings>
+      <b:widget-setting name='showSnippet'>true</b:widget-setting>
+      <b:widget-setting name='showPostTitle'>true</b:widget-setting>
+      <b:widget-setting name='showFirstImage'>true</b:widget-setting>
+      <b:widget-setting name='useMostRecentPost'>true</b:widget-setting>
+    </b:widget-settings>
+    <b:includable id='main'>
         <b:if cond='data:title != &quot;&quot;'><h2 class='title'><data:title/></h2></b:if>
         <b:include name='content'/>
         <b:include name='quickedit'/>
       </b:includable>
-      <b:includable id='content'>
+    <b:includable id='content'>
         <div class='post-summary'>
           <b:if cond='data:showPostTitle and data:postTitle != &quot;&quot;'>
             <h3><a expr:href='data:postUrl'><data:postTitle/></a></h3>
@@ -1582,62 +1745,57 @@ var cursor=null;if(items&&items.length>0){cursor=parseInt(items[items.length-1].
           </b:if>
         </div>
       </b:includable>
-    </b:widget>
-    <b:widget id='HTML4' locked='false' title='' type='HTML' version='2' visible='true'>
-      <b:widget-settings>
-        <b:widget-setting name='content'/>
-      </b:widget-settings>
-      <b:includable id='main'>
+  </b:widget>
+  <b:widget id='HTML4' locked='false' title='' type='HTML' version='2' visible='true'>
+    <b:includable id='main'>
         <b:include name='widget-title'/>
         <div class='widget-content'><data:content/></div>
       </b:includable>
-    </b:widget>
-    <b:widget id='HTML2' locked='false' title='@' type='HTML' version='1'>
-      <b:widget-settings>
-        <b:widget-setting name='content'/>
-      </b:widget-settings>
-      <b:includable id='main'>
+  </b:widget>
+  <b:widget id='HTML2' locked='false' title='@' type='HTML' version='1'>
+    <b:widget-settings>
+      <b:widget-setting name='content'/>
+    </b:widget-settings>
+    <b:includable id='main'>
         <b:if cond='data:title != &quot;&quot;'>
           <p class='text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2'><data:title/></p>
         </b:if>
         <div class='widget-content'><data:content/></div>
         <b:include name='quickedit'/>
       </b:includable>
-    </b:widget>
-  </b:section-contents>
-
-  <b:section-contents id='sidebar-right-2-1'>
-    <b:widget id='Followers1' locked='false' title='Followers' type='Followers'>
-      <b:widget-settings>
-        <b:widget-setting name='borderColorTransparent'>true</b:widget-setting>
-        <b:widget-setting name='useTemplateDefaultStyles'>true</b:widget-setting>
-        <b:widget-setting name='contentSecondaryTextColor'>#000000</b:widget-setting>
-        <b:widget-setting name='contentHeadlineColor'>#000000</b:widget-setting>
-        <b:widget-setting name='endcapTextColor'>#000000</b:widget-setting>
-        <b:widget-setting name='contentTextColor'>#000000</b:widget-setting>
-        <b:widget-setting name='contentSecondaryLinkColor'>#FFFFFF</b:widget-setting>
-        <b:widget-setting name='endcapLinkColor'>#000000</b:widget-setting>
-        <b:widget-setting name='contentLinkColor'>#000000</b:widget-setting>
-      </b:widget-settings>
-      <b:includable id='main'>
-        <b:if cond='data:title != &quot;&quot; and data:codeSnippet != &quot;&quot;'>
-          <h2 class='title'><data:title/></h2>
-        </b:if>
-        <div class='widget-content'>
-          <div expr:id='data:widget.instanceId + &quot;-wrapper&quot;'>
-            <b:if cond='data:codeSnippet != &quot;&quot;'>
-              <div style='margin-right:2px;'><data:codeSnippet/></div>
-            </b:if>
-          </div>
-          <b:include name='quickedit'/>
+  </b:widget>
+</b:section-contents><b:section-contents id='sidebar-right-2-1'>
+  <b:widget id='Followers1' locked='false' title='Followers' type='Followers'>
+    <b:widget-settings>
+      <b:widget-setting name='borderColorTransparent'>true</b:widget-setting>
+      <b:widget-setting name='useTemplateDefaultStyles'>true</b:widget-setting>
+      <b:widget-setting name='contentSecondaryTextColor'>#000000</b:widget-setting>
+      <b:widget-setting name='contentHeadlineColor'>#000000</b:widget-setting>
+      <b:widget-setting name='endcapTextColor'>#000000</b:widget-setting>
+      <b:widget-setting name='contentTextColor'>#000000</b:widget-setting>
+      <b:widget-setting name='contentSecondaryLinkColor'>#FFFFFF</b:widget-setting>
+      <b:widget-setting name='endcapLinkColor'>#000000</b:widget-setting>
+      <b:widget-setting name='contentLinkColor'>#000000</b:widget-setting>
+    </b:widget-settings>
+    <b:includable id='main'>
+  <b:if cond='data:title != &quot;&quot; and data:codeSnippet != &quot;&quot;'>
+    <h2 class='title'><data:title/></h2>
+  </b:if>
+  <div class='widget-content'>
+    <div expr:id='data:widget.instanceId + &quot;-wrapper&quot;'>
+      <b:if cond='data:codeSnippet != &quot;&quot;'>
+        <div style='margin-right:2px;'>
+          <data:codeSnippet/>
         </div>
-      </b:includable>
-    </b:widget>
-  </b:section-contents>
-
-  <b:section-contents id='sidebar-right-2-2'>
-    <b:widget id='BlogSearch1' locked='false' title='Search' type='BlogSearch' version='1'>
-      <b:includable id='main'>
+      </b:if>
+    </div>
+    <b:include name='quickedit'/>
+  </div>
+</b:includable>
+  </b:widget>
+</b:section-contents><b:section-contents id='sidebar-right-2-2'>
+  <b:widget id='BlogSearch1' locked='false' title='Search' type='BlogSearch' version='1'>
+    <b:includable id='main'>
         <b:if cond='data:title != &quot;&quot;'><h2 class='title'><data:title/></h2></b:if>
         <div class='widget-content'>
           <div expr:id='data:widget.instanceId + &quot;_form&quot;'>
@@ -1656,23 +1814,21 @@ var cursor=null;if(items&&items.length>0){cursor=parseInt(items[items.length-1].
         </div>
         <b:include name='quickedit'/>
       </b:includable>
-    </b:widget>
-  </b:section-contents>
-
-  <b:section-contents id='sidebar-right-3'>
-    <b:widget id='BlogArchive1' locked='false' title='Blog Archive' type='BlogArchive'>
-      <b:widget-settings>
-        <b:widget-setting name='showStyle'>FLAT</b:widget-setting>
-        <b:widget-setting name='yearPattern'>yyyy</b:widget-setting>
-        <b:widget-setting name='showWeekEnd'>true</b:widget-setting>
-        <b:widget-setting name='monthPattern'>MMMM yyyy</b:widget-setting>
-        <b:widget-setting name='dayPattern'>MMM dd</b:widget-setting>
-        <b:widget-setting name='weekPattern'>MM/dd</b:widget-setting>
-        <b:widget-setting name='chronological'>false</b:widget-setting>
-        <b:widget-setting name='showPosts'>true</b:widget-setting>
-        <b:widget-setting name='frequency'>MONTHLY</b:widget-setting>
-      </b:widget-settings>
-      <b:includable id='main'>
+  </b:widget>
+</b:section-contents><b:section-contents id='sidebar-right-3'>
+  <b:widget id='BlogArchive1' locked='false' title='Blog Archive' type='BlogArchive' version='1'>
+    <b:widget-settings>
+      <b:widget-setting name='showStyle'>FLAT</b:widget-setting>
+      <b:widget-setting name='yearPattern'>yyyy</b:widget-setting>
+      <b:widget-setting name='showWeekEnd'>true</b:widget-setting>
+      <b:widget-setting name='monthPattern'>MMMM yyyy</b:widget-setting>
+      <b:widget-setting name='dayPattern'>MMM dd</b:widget-setting>
+      <b:widget-setting name='weekPattern'>MM/dd</b:widget-setting>
+      <b:widget-setting name='chronological'>false</b:widget-setting>
+      <b:widget-setting name='showPosts'>true</b:widget-setting>
+      <b:widget-setting name='frequency'>MONTHLY</b:widget-setting>
+    </b:widget-settings>
+    <b:includable id='main'>
         <b:if cond='data:title != &quot;&quot;'><h2><data:title/></h2></b:if>
         <div class='widget-content'>
           <div id='ArchiveList'>
@@ -1685,12 +1841,12 @@ var cursor=null;if(items&&items.length>0){cursor=parseInt(items[items.length-1].
           <b:include name='quickedit'/>
         </div>
       </b:includable>
-      <b:includable id='flat' var='data'>
+    <b:includable id='flat' var='data'>
         <ul class='flat'><b:loop values='data:data' var='i'>
           <li class='archivedate'><a expr:href='data:i.url'><data:i.name/></a> (<data:i.post-count/>)</li>
         </b:loop></ul>
       </b:includable>
-      <b:includable id='interval' var='intervalData'>
+    <b:includable id='interval' var='intervalData'>
         <b:loop values='data:intervalData' var='interval'>
           <ul class='hierarchy'><li expr:class='&quot;archivedate &quot; + data:interval.expclass'>
             <b:include cond='data:interval.toggleId' data='interval' name='toggle'/>
@@ -1701,7 +1857,7 @@ var cursor=null;if(items&&items.length>0){cursor=parseInt(items[items.length-1].
           </li></ul>
         </b:loop>
       </b:includable>
-      <b:includable id='menu' var='data'>
+    <b:includable id='menu' var='data'>
         <select expr:id='data:widget.instanceId + &quot;_ArchiveMenu&quot;'>
           <option value=''><data:title/></option>
           <b:loop values='data:data' var='i'>
@@ -1709,12 +1865,12 @@ var cursor=null;if(items&&items.length>0){cursor=parseInt(items[items.length-1].
           </b:loop>
         </select>
       </b:includable>
-      <b:includable id='posts' var='posts'>
+    <b:includable id='posts' var='posts'>
         <ul class='posts'><b:loop values='data:posts' var='post'>
           <li><a expr:href='data:post.url'><data:post.title/></a></li>
         </b:loop></ul>
       </b:includable>
-      <b:includable id='toggle' var='interval'>
+    <b:includable id='toggle' var='interval'>
         <a class='toggle' href='javascript:void(0)'>
           <span expr:class='&quot;zippy&quot; + (data:interval.expclass == &quot;expanded&quot; ? &quot; toggle-open&quot; : &quot;&quot;)'>
             <b:if cond='data:interval.expclass == &quot;expanded&quot;'>&#9660;&#160;
@@ -1724,12 +1880,10 @@ var cursor=null;if(items&&items.length>0){cursor=parseInt(items[items.length-1].
           </span>
         </a>
       </b:includable>
-    </b:widget>
-  </b:section-contents>
-
-  <b:section-contents id='footer-1'>
-    <b:widget id='ContactForm2' locked='false' title='Send Feedback' type='ContactForm'>
-      <b:includable id='main'>
+  </b:widget>
+</b:section-contents><b:section-contents id='footer-1'>
+  <b:widget id='ContactForm2' locked='false' title='Send Feedback' type='ContactForm' version='1'>
+    <b:includable id='main'>
         <b:if cond='data:title != &quot;&quot;'><h2 class='title'><data:title/></h2></b:if>
         <div class='contact-form-widget'>
           <div class='form'>
@@ -1752,9 +1906,9 @@ var cursor=null;if(items&&items.length>0){cursor=parseInt(items[items.length-1].
         </div>
         <b:include name='quickedit'/>
       </b:includable>
-    </b:widget>
-    <b:widget id='ContactForm1' locked='false' title='Contact Form' type='ContactForm' version='1'>
-      <b:includable id='main'>
+  </b:widget>
+  <b:widget id='ContactForm1' locked='false' title='Contact Form' type='ContactForm' version='1'>
+    <b:includable id='main'>
         <b:if cond='data:title != &quot;&quot;'><h2 class='title'><data:title/></h2></b:if>
         <div class='contact-form-widget'>
           <div class='form'>
@@ -1777,10 +1931,5 @@ var cursor=null;if(items&&items.length>0){cursor=parseInt(items[items.length-1].
         </div>
         <b:include name='quickedit'/>
       </b:includable>
-    </b:widget>
-  </b:section-contents>
-
-  <b:section-contents id='footer-2-1'/>
-  <b:section-contents id='footer-2-2'/>
-
-</html>
+  </b:widget>
+</b:section-contents><b:section-contents id='footer-2-1'/><b:section-contents id='footer-2-2'/></html>
